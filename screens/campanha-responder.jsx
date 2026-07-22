@@ -1,4 +1,4 @@
-/* global React, Icon, Logo, CLIENTES, DIAGNOSTICOS, CAMPANHAS, getCampanhaRespondidos, jaRespondeuCampanha, registrarRespostaCampanha */
+/* global React, Icon, Logo, CLIENTES, DIAGNOSTICOS, CAMPANHAS, getCampanhaRespondidos, getCampanhaStatusEfetivo, jaRespondeuCampanha, registrarRespostaCampanha, fmtData */
 
 // ════════════════════════════════════════════════════════════
 // CAMPANHA RESPONDER — página pública (link da campanha):
@@ -733,11 +733,8 @@ const CampanhaResponderScreen = ({ campanhaId, setorParam, cargoParam }) => {
   const [fase, setFase] = React.useState("cadastro"); // cadastro | questionario | concluido
   const [respondente, setRespondente] = React.useState(null);
 
-  const hoje = new Date().toISOString().slice(0, 10);
-  const dentroDoPeriodo = campanha ? (hoje >= campanha.dataInicial && hoje <= campanha.dataFinal) : false;
-  const respondidos = campanha ? getCampanhaRespondidos(campanha) : 0;
-  const metaAtingida = campanha ? respondidos >= campanha.quantidadeFuncionarios : false;
-  const disponivel = campanha && campanha.status === "ativa" && dentroDoPeriodo && !metaAtingida;
+  const statusEfetivo = campanha ? getCampanhaStatusEfetivo(campanha) : null;
+  const disponivel = statusEfetivo === "ativa";
 
   const wrapperStyle = { minHeight: "100vh", background: "var(--canvas-warm)", display: "flex", flexDirection: "column", alignItems: "center", padding: "20px 20px 60px" };
   const innerContainer = { width: "100%", maxWidth: 720 };
@@ -754,14 +751,23 @@ const CampanhaResponderScreen = ({ campanhaId, setorParam, cargoParam }) => {
   }
 
   if (fase === "cadastro" && !disponivel) {
+    const respondidos = getCampanhaRespondidos(campanha);
+    const metaAtingida = respondidos >= campanha.quantidadeFuncionarios;
+    const hoje = new Date().toISOString().slice(0, 10);
+    const prazoVencido = statusEfetivo === "encerrada" && !metaAtingida && hoje > campanha.dataFinal;
+
     return (
       <div style={wrapperStyle}>
         <div style={innerContainer}><RespHeader cliente={cliente} diagnostico={diagnostico} /></div>
         <div style={{ flex: 1, display: "flex", alignItems: "center" }}>
           {metaAtingida ? (
             <CampanhaStateCard icon="check" iconColor="var(--health-deep)" tone="success" title="Meta de avaliações atingida" desc={`A campanha "${campanha.titulo}" já coletou o número de avaliações previsto. Obrigado pelo interesse!`} />
+          ) : prazoVencido ? (
+            <CampanhaStateCard icon="calendar" iconColor="var(--ink-muted)" title="Campanha encerrada" desc={`A campanha "${campanha.titulo}" foi encerrada. O período de coleta foi até ${fmtData(campanha.dataFinal)}. Fale com o responsável pela pesquisa na sua empresa para mais informações.`} />
+          ) : statusEfetivo === "agendada" ? (
+            <CampanhaStateCard icon="calendar" iconColor="var(--ink-muted)" title="Campanha ainda não começou" desc={`A campanha "${campanha.titulo}" abre para respostas em ${fmtData(campanha.dataInicial)}. Volte a acessar o link a partir dessa data.`} />
           ) : (
-            <CampanhaStateCard icon="calendar" iconColor="var(--ink-muted)" title="Campanha indisponível" desc={`A campanha "${campanha.titulo}" está ${campanha.status === "ativa" ? "fora do período de coleta" : "pausada"} no momento. Fale com o responsável pela pesquisa na sua empresa.`} />
+            <CampanhaStateCard icon="calendar" iconColor="var(--ink-muted)" title="Campanha pausada" desc={`A campanha "${campanha.titulo}" está pausada no momento. Fale com o responsável pela pesquisa na sua empresa.`} />
           )}
         </div>
       </div>

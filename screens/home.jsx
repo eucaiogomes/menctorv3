@@ -31,13 +31,14 @@ const CountUp = ({ value, decimals = 0, prefix = "", suffix = "", duration = 900
 const HomeScreen = ({ navigate }) => {
   const ativos = CLIENTES.filter(c => c.status === "ativo");
   const negociacao = CLIENTES.filter(c => c.status === "negociacao");
-  const mrr = ativos.reduce((s, c) => s + c.mrr, 0);
-  const avgRisk = ativos.reduce((s, c) => s + c.risk, 0) / ativos.length;
+  const ativosComRisco = ativos.filter(c => c.risk != null);
+  const mrr = ativos.reduce((s, c) => s + (c.mrr || 0), 0);
+  const avgRisk = ativosComRisco.length ? ativosComRisco.reduce((s, c) => s + c.risk, 0) / ativosComRisco.length : 0;
   const emCampo = AVALIACOES_ATIVAS.filter(a => a.status === "Em campo");
 
-  const totalColabs = ativos.reduce((s, c) => s + c.employees, 0);
-  const highRiskCount = ativos.filter(c => c.risk >= 2.5).length;
-  const healthyCount = ativos.filter(c => c.risk < 1.5).length;
+  const totalColabs = ativos.reduce((s, c) => s + (c.employees || 0), 0);
+  const highRiskCount = ativosComRisco.filter(c => c.risk >= 2.5).length;
+  const healthyCount = ativosComRisco.filter(c => c.risk < 1.5).length;
   const totalRespostas = emCampo.reduce((s, a) => s + a.respondidos, 0);
   const totalAlvo = emCampo.reduce((s, a) => s + a.alvo, 0);
   const adesaoGeral = totalAlvo > 0 ? Math.round((totalRespostas / totalAlvo) * 100) : 0;
@@ -50,9 +51,9 @@ const HomeScreen = ({ navigate }) => {
 
   const [riskFilter, setRiskFilter] = useState("all");
   const filteredAtivos = riskFilter === "all" ? ativos :
-    riskFilter === "healthy" ? ativos.filter(c => c.risk < 1.5) :
-    riskFilter === "moderate" ? ativos.filter(c => c.risk >= 1.5 && c.risk < 2.5) :
-    ativos.filter(c => c.risk >= 2.5);
+    riskFilter === "healthy" ? ativosComRisco.filter(c => c.risk < 1.5) :
+    riskFilter === "moderate" ? ativosComRisco.filter(c => c.risk >= 1.5 && c.risk < 2.5) :
+    ativosComRisco.filter(c => c.risk >= 2.5);
 
   const dimAverages = [
     { name: "Carga de trabalho", v: 2.68 },

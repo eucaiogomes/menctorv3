@@ -56,11 +56,12 @@ const RoadmapScreen = ({ navigate, params = {} }) => {
     if (clienteId && !isNovoFlow && window.MenctorDB && typeof window.MenctorDB.getClient === "function") {
       window.MenctorDB.getClient(clienteId).then(full => {
         if (mounted && full) {
+          // Guardamos o registro do Supabase só em dbLoaded (usado abaixo para
+          // montar a tela do roadmap) — NÃO gravamos em window.CLIENTES, que é
+          // o mock usado pela Visão Geral. Esse registro real não tem os campos
+          // do dashboard (risk, healthScore, color...) e sobrescrevia/corrompia
+          // os clientes de demonstração, causando tela branca ao voltar pra lá.
           setDbLoaded(full);
-          if (!window.CLIENTES) window.CLIENTES = [];
-          const idx = window.CLIENTES.findIndex(x => x.id == clienteId);
-          if (idx >= 0) window.CLIENTES[idx] = full;
-          else window.CLIENTES.unshift(full);
           if (full.etapas) {
             if (!window.ETAPAS_CLIENTE) window.ETAPAS_CLIENTE = {};
             window.ETAPAS_CLIENTE[clienteId] = full.etapas;

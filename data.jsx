@@ -191,6 +191,19 @@ const getCampanhaRespostas = (campanhaId) => {
 
 const getCampanhaRespondidos = (campanha) => (campanha?.respondidos || 0) + getCampanhaRespostas(campanha?.id).length;
 
+// Status "de verdade" da campanha, considerando data final e meta de respostas —
+// mesmo que o campo status guardado ainda diga "ativa", a campanha aparece
+// como encerrada para quem acessa o link após o prazo ou a meta ser atingida.
+const getCampanhaStatusEfetivo = (campanha) => {
+  if (!campanha) return null;
+  const hoje = new Date().toISOString().slice(0, 10);
+  const metaAtingida = getCampanhaRespondidos(campanha) >= (campanha.quantidadeFuncionarios || 0);
+  if (metaAtingida || hoje > campanha.dataFinal) return "encerrada";
+  if (campanha.status !== "ativa") return "pausada";
+  if (hoje < campanha.dataInicial) return "agendada";
+  return "ativa";
+};
+
 const jaRespondeuCampanha = (campanhaId, cpf) => getCampanhaRespostas(campanhaId).some(r => r.cpfHash === hashCPF(cpf));
 
 const registrarRespostaCampanha = (campanha, { cpf, setor, cargo, mediaRisco, porDimensao }) => {

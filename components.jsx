@@ -367,7 +367,7 @@ const RiskMedallion = ({ value, max = 4, size = 64 }) => {
   );
 };
 
-const riskLabel = (v) => v >= 2.5 ? "Alto risco" : v >= 1.5 ? "Moderado" : "Saudável";
-const riskPill  = (v) => v >= 2.5 ? "pill-coral" : v >= 1.5 ? "pill-amber" : "pill";
+const riskLabel = (v) => v == null ? "Sem diagnóstico" : v >= 2.5 ? "Alto risco" : v >= 1.5 ? "Moderado" : "Saudável";
+const riskPill  = (v) => v == null ? "pill-neutral" : v >= 2.5 ? "pill-coral" : v >= 1.5 ? "pill-amber" : "pill";
 
 Object.assign(window, { Icon, Logo, Sidebar, TopBar, AppHeader, Page, RiskMedallion, riskLabel, riskPill, NAV_ITEMS, RoleSwitcher, ROLES });

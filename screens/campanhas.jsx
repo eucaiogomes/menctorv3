@@ -1,4 +1,4 @@
-/* global React, Icon, Page, CLIENTES, DIAGNOSTICOS, CAMPANHAS, getCampanhaRespondidos */
+/* global React, Icon, Page, CLIENTES, DIAGNOSTICOS, CAMPANHAS, getCampanhaRespondidos, getCampanhaStatusEfetivo */
 
 // ════════════════════════════════════════════════════════════
 // CAMPANHAS — cria e distribui um link de coleta para um
@@ -125,12 +125,18 @@ const CampanhasScreen = ({ navigate }) => {
             const respondidos = getCampanhaRespondidos(c);
             const pct = c.quantidadeFuncionarios ? Math.min(100, Math.round((respondidos / c.quantidadeFuncionarios) * 100)) : 0;
             const completa = respondidos >= c.quantidadeFuncionarios;
+            const statusEfetivo = getCampanhaStatusEfetivo(c);
+            const encerradaPorPrazo = statusEfetivo === "encerrada" && !completa;
             return (
               <div key={c.id} className="card" style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
                 <div style={{ flex: 1, minWidth: 260 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                     <span style={{ fontFamily: "var(--display)", fontWeight: 600, fontSize: 17, color: "var(--ink)" }}>{c.titulo}</span>
-                    <span className={`pill ${c.status === "ativa" ? "pill-brand" : "pill-neutral"}`} style={{ fontSize: 10.5 }}>{c.status === "ativa" ? "Ativa" : "Inativa"}</span>
+                    {encerradaPorPrazo ? (
+                      <span className="pill pill-neutral" style={{ fontSize: 10.5 }}>Encerrada</span>
+                    ) : (
+                      <span className={`pill ${c.status === "ativa" ? "pill-brand" : "pill-neutral"}`} style={{ fontSize: 10.5 }}>{c.status === "ativa" ? "Ativa" : "Inativa"}</span>
+                    )}
                     {completa && <span className="pill pill-sky" style={{ fontSize: 10.5 }}>Meta atingida</span>}
                   </div>
                   <div style={{ marginTop: 4, fontSize: 12.5, color: "var(--ink-muted)", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
