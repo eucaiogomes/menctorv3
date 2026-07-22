@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste de Preenchimento Automático — Link → Cadastro (18 perguntas)</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 860px; margin: 40px auto; padding: 20px; line-height: 1.5; background:#f8f7f4; color:#222; }
+    .card { background:white; border-radius:12px; padding:24px; border:1px solid #ddd; margin-bottom:20px; }
+    h1 { font-size:24px; }
+    button { padding:10px 16px; border-radius:8px; border:1px solid #E87722; background:#E87722; color:white; cursor:pointer; font-weight:600; }
+    button.secondary { background:white; color:#E87722; }
+    pre { background:#111; color:#0f0; padding:12px; border-radius:8px; overflow:auto; font-size:12px; }
+    .ok { color:#2F7D6F; font-weight:600; }
+    .label { font-size:12px; text-transform:uppercase; letter-spacing:.5px; color:#666; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Teste do fluxo: Link → Formulário (18 perguntas) → Preenchimento Automático</h1>
+  
+  <div class="card">
+    <p><strong>Passo 1:</strong> Clique no botão abaixo para <strong>simular o envio do formulário público</strong> (exatamente como o link faria).</p>
+    <button onclick="simulateFormSubmit()">Simular envio do formulário pelo link (todas as 18 perguntas)</button>
+    <button onclick="clearStorage()" class="secondary" style="margin-left:8px">Limpar storage de teste</button>
+    <p style="font-size:12px;margin-top:8px">Isso grava no localStorage com a mesma chave que o app usa (<code>MENCTOR_EMPRESA_FORM_...</code>).</p>
+  </div>
+
+  <div class="card">
+    <p><strong>Passo 2:</strong> Agora abra o app real e vá para uma das telas de cadastro:</p>
+    <ul>
+      <li><a href="./?empresa-form=teste-auto" target="_blank">Abrir formulário público vazio</a></li>
+      <li>Abra o app normalmente → vá em um cliente → aba Cadastro (Roadmap) → deve aparecer banner "Formulário recebido"</li>
+      <li>Ou use <code>/clientes/novo</code> (fluxo 7 etapas) — etapa 1 deve preencher automaticamente.</li>
+    </ul>
+    <p>Ou use os helpers no console do app:</p>
+    <pre>window.__SIMULAR_FORM_CADASTRO()
+window.__SIMULAR_FORM_CADASTRO_NOVO()</pre>
+  </div>
+
+  <div class="card">
+    <div class="label">Payload que será salvo (todas as 18 perguntas)</div>
+    <pre id="payload-preview"></pre>
+  </div>
+
+  <div class="card">
+    <p><strong>Passo 3 (verificação manual):</strong> Após aplicar no app, confira se os seguintes campos estão preenchidos:</p>
+    <ul id="checklist"></ul>
+  </div>
+
+  <script>
+    const STORAGE_KEY_PREFIX = 'MENCTOR_EMPRESA_FORM_';
+
+    const SAMPLE = {
+      razaoSocial: "Indústria Metalúrgica São José Ltda",
+      responsavel: "Carla Mendes de Souza",
+      email: "carla.mendes@saojose.com.br",
+      telefone: "(11) 98765-4321",
+      cnpj: "12.345.678/0001-90",
+      qtdPorArea: { administrativo: "48", operacional: "185", vendas: "22", producao: "210", atendimento: "35", qualidade: "18" },
+      qtdCargos: "67",
+      segmento: "Indústria metalúrgica e usinagem",
+      unidades: "Matriz em São Paulo + 2 filiais",
+      cidades: "São Paulo, Campinas, Ribeirão Preto",
+      terceirizados: "42 (principalmente logística e limpeza)",
+      possui: ["Técnico de Segurança do trabalho", "CIPA", "PGR - Programa de Gerenciamento de Riscos", "SESMT"],
+      indicadores: ["Turnover médio dos últimos 12 meses", "Afastamentos previdenciários (principalmente saúde mental)"],
+      mapeamentoFormal: "Parcialmente",
+      pesquisaClima: "Sim",
+      canaisEscuta: "Sim",
+      fiscalizacaoEvidencia: "Não",
+      gestaoRiscosOutra: "Iniciando mapeamento com consultoria.",
+      pressaoMetas: "Sim",
+      ritmoIntenso: "Parcialmente",
+      capacitacaoLideranca: "Não",
+      conflitosRecorrentes: "Sim",
+      assedioMoral: "Não",
+      liderancaOutra: "Alta rotatividade de supervisores.",
+      juridicoAcompanha: "Sim",
+      acaoTrabalhistaMental: "Parcialmente",
+      senteProtegida: "Não",
+      juridicaOutra: "",
+      excessoTrabalho: true,
+      prazosInatingiveis: true,
+      faltaControle: false,
+      estruturaNaoAplica: false,
+      estruturaOutra: "3 turnos + plantão",
+      trabalhaCom: ["Metas individuais ou coletivas agressivas", "Trabalho por turnos ou jornadas noturnas", "Terceirizados ou prestadores de serviços"],
+      // legacy para compat
+      razao: "Indústria Metalúrgica São José Ltda",
+      nome: "São José Metais",
+      contatoNome: "Carla Mendes de Souza",
+      contatoEmail: "carla.mendes@saojose.com.br",
+      contatoWhats: "(11) 98765-4321",
+      submittedAt: new Date().toISOString()
+    };
+
+    function simulateFormSubmit() {
+      const token = "teste-auto-" + Date.now().toString(36);
+      const key = STORAGE_KEY_PREFIX + token;
+      const payload = { ...SAMPLE, submittedAt: new Date().toISOString() };
+      
+      localStorage.setItem(key, JSON.stringify(payload));
+      
+      alert("✅ Payload salvo!\n\nToken: " + token + "\n\nAgora:\n1. Abra o app real\n2. Vá para a tela de Cadastro (ou /clientes/novo)\n3. O banner de import ou preenchimento automático deve aparecer.\n\nLink direto do form: " + location.origin + location.pathname.replace(/test-preenchimento-link.html.*/, '') + "?empresa-form=" + token);
+      
+      // também abre o form público para mostrar a página "obrigado"
+      const formLink = (location.origin + location.pathname.replace(/test-preenchimento-link.html.*/, '')).replace(/\/$/, '') + "/?empresa-form=" + token;
+      window.open(formLink, '_blank');
+      
+      document.getElementById('payload-preview').textContent = JSON.stringify(payload, null, 2);
+    }
+
+    function clearStorage() {
+      Object.keys(localStorage).forEach(k => {
+        if (k.startsWith(STORAGE_KEY_PREFIX)) localStorage.removeItem(k);
+      });
+      alert("Storage de formulários limpo.");
+    }
+
+    // preview inicial
+    document.getElementById('payload-preview').textContent = JSON.stringify(SAMPLE, null, 2);
+
+    // checklist visual das 18 perguntas
+    const checks = [
+      "1. Razão Social → " + SAMPLE.razaoSocial,
+      "2. Responsável → " + SAMPLE.responsavel,
+      "3. E-mail → " + SAMPLE.email,
+      "4. Telefone → " + SAMPLE.telefone,
+      "5. CNPJ → " + SAMPLE.cnpj,
+      "6. qtdPorArea (6 áreas) → administrativo=" + SAMPLE.qtdPorArea.administrativo + ", operacional=" + SAMPLE.qtdPorArea.operacional + " ...",
+      "7. qtdCargos → " + SAMPLE.qtdCargos,
+      "8. Segmento → " + SAMPLE.segmento,
+      "9. Unidades → " + SAMPLE.unidades,
+      "10. Cidades → " + SAMPLE.cidades,
+      "11. Terceirizados → " + SAMPLE.terceirizados,
+      "12. 'Possui' (checkboxes) → " + SAMPLE.possui.join(", "),
+      "13. 'Indicadores' → " + SAMPLE.indicadores.join(", "),
+      "14. mapeamentoFormal / pesquisaClima / canaisEscuta / fiscalizacaoEvidencia → " + SAMPLE.mapeamentoFormal + " / " + SAMPLE.pesquisaClima,
+      "15. pressaoMetas / ritmoIntenso / ... → " + SAMPLE.pressaoMetas,
+      "16. jurídico / ação trabalhista / sente protegida → " + SAMPLE.juridicoAcompanha,
+      "17. Estrutura (excessoTrabalho etc) → excesso=" + SAMPLE.excessoTrabalho + ", prazos=" + SAMPLE.prazosInatingiveis,
+      "18. trabalhaCom → " + SAMPLE.trabalhaCom.join(" + ")
+    ];
+    const ul = document.getElementById('checklist');
+    checks.forEach(c => {
+      const li = document.createElement('li');
+      li.textContent = c;
+      ul.appendChild(li);
+    });
+
+    console.log('%c[Test page] Pronto. Clique no botão "Simular envio" para gerar um payload completo.', 'color:#666');
+  </script>
+</body>
+</html>

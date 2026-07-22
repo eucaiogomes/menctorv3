@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste: Envio do Link + Aceitação da Proposta • Menctor</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@700&amp;display=swap');
+    :root { --accent: #E87722; --health: #2F7D6F; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f8f7f4; color: #222; margin: 0; padding: 20px; line-height: 1.5; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    h1 { font-family: 'Playfair Display', serif; font-size: 32px; }
+    .card { background: white; border-radius: 12px; padding: 24px; border: 1px solid #e5e3df; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    button { background: #E87722; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; }
+    button.secondary { background: #fff; color: #E87722; border: 1px solid #E87722; }
+    .link-box { font-family: monospace; background: #111; color: #0f0; padding: 12px; border-radius: 8px; word-break: break-all; font-size: 13px; }
+    .status { padding: 8px 14px; border-radius: 999px; font-size: 13px; display: inline-block; }
+    .status.sent { background: #e6f0eb; color: #2F7D6F; }
+    .status.accepted { background: #2F7D6F; color: white; }
+    pre { background: #111; color: #0f0; padding: 12px; border-radius: 8px; overflow: auto; font-size: 12px; }
+    .step { border-left: 4px solid #E87722; padding-left: 16px; margin-bottom: 16px; }
+    .log { background: #f1f0ed; padding: 10px; border-radius: 6px; font-size: 12px; font-family: monospace; max-height: 160px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 Teste Completo: Envio do Link + Aceitação da Proposta</h1>
+    <p>Este arquivo simula o fluxo real do Menctor sem precisar rodar o app inteiro. Ele usa o mesmo padrão de localStorage que o código real.</p>
+
+    <div class="grid">
+      <!-- CONSULTANT SIDE -->
+      <div class="card">
+        <h2 style="margin-top:0; color:#E87722">Lado do Consultor</h2>
+        <div class="step">
+          <strong>Passo 1:</strong> Gerar e "enviar" o link
+          <br><br>
+          <button onclick="consultantSendProposal()">📤 Enviar link da proposta (simula o modal)</button>
+        </div>
+
+        <div id="consultant-link-area" style="display:none; margin-top:16px">
+          <div><strong>Link gerado para o cliente:</strong></div>
+          <div class="link-box" id="proposal-link"></div>
+          <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+            <button onclick="copyLink()">📋 Copiar link</button>
+            <button onclick="simulateSendEmail()" class="secondary">✉️ Simular envio por e-mail</button>
+            <button onclick="openClientPortal()" class="secondary">👀 Abrir visualização do cliente</button>
+          </div>
+          <div id="consultant-status" style="margin-top:12px"></div>
+        </div>
+
+        <div style="margin-top:20px">
+          <strong>Status no pipeline / roadmap:</strong>
+          <div id="pipeline-status" class="status" style="background:#f1f0ed; color:#666">Aguardando envio</div>
+        </div>
+
+        <div style="margin-top:16px; font-size:12px; color:#666">
+          (No app real: abre o modal SendProposalModal → salva snapshot + gera ?proposta=TOKEN)
+        </div>
+      </div>
+
+      <!-- CLIENT SIDE -->
+      <div class="card">
+        <h2 style="margin-top:0; color:#2F7D6F">Lado do Cliente</h2>
+        <div class="step">
+          <strong>Passo 2:</strong> Cliente abre o link e aceita
+          <br><br>
+          <button onclick="openClientPortal()" style="background:#2F7D6F">🔗 Abrir página do cliente (PortalPropostaScreen)</button>
+        </div>
+
+        <div id="client-view" style="display:none; margin-top:16px; border:1px solid #ddd; border-radius:8px; padding:16px; background:#faf8f4">
+          <div style="font-weight:600; margin-bottom:8px">Proposta para <span id="client-company"></span></div>
+          <div style="font-size:13px; margin-bottom:12px">Investimento: R$ <span id="client-value"></span>/mês • <span id="client-funcs"></span> colaboradores</div>
+
+          <button id="accept-btn" onclick="clientAcceptProposal()" style="background:#2F7D6F; width:100%">✅ Aceitar proposta</button>
+          <div id="client-accepted" style="display:none; margin-top:12px; color:#2F7D6F; font-weight:600">
+            ✓ Proposta aceita com sucesso! (savedAt mostrado abaixo)
+          </div>
+        </div>
+
+        <div style="margin-top:12px; font-size:12px; color:#666">
+          (No app real: abre <code>/?proposta=TOKEN</code> → carrega PortalPropostaScreen → clique "Aceitar proposta")
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="card">
+      <h3>Resultado do Teste</h3>
+      <div id="test-result" style="padding:14px; background:#f8f7f4; border-radius:8px; min-height:60px; font-size:14px">
+        Execute os passos acima para testar o fluxo completo.
+      </div>
+
+      <div style="margin-top:16px">
+        <button onclick="checkConsultantDetection()" class="secondary">🔍 Verificar detecção automática no lado consultor</button>
+        <button onclick="resetTest()" class="secondary" style="margin-left:8px">🔄 Resetar teste</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Logs (localStorage keys usados)</h3>
+      <div class="log" id="logs"></div>
+      <button onclick="showStorage()" style="margin-top:8px" class="secondary">Mostrar dados no localStorage</button>
+    </div>
+  </div>
+
+  <script>
+    const LOG = (msg) => {
+      const el = document.getElementById('logs');
+      const time = new Date().toLocaleTimeString();
+      el.innerHTML += `[${time}] ${msg}<br>`;
+      el.scrollTop = el.scrollHeight;
+    };
+
+    let currentToken = null;
+    let currentSnap = null;
+
+    function consultantSendProposal() {
+      currentToken = 'prop-test-' + Date.now().toString(36);
+      
+      currentSnap = {
+        id: currentToken,
+        empresa: "Indústria São José Ltda",
+        contato: "Carla Mendes",
+        email: "carla@saojose.com.br",
+        funcionarios: 518,
+        valor: 8900,
+        savedAt: new Date().toISOString()
+      };
+
+      // Same as real SendProposalModal
+      localStorage.setItem(`MENCTOR_PROPOSAL_${currentToken}`, JSON.stringify(currentSnap));
+      LOG(`✅ Snapshot salvo: MENCTOR_PROPOSAL_${currentToken}`);
+
+      const link = `${location.origin}${location.pathname}?proposta=${encodeURIComponent(currentToken)}`;
+      
+      document.getElementById('proposal-link').textContent = link;
+      document.getElementById('consultant-link-area').style.display = 'block';
+      document.getElementById('pipeline-status').innerHTML = 'Link enviado • Aguardando aceite';
+      document.getElementById('pipeline-status').className = 'status sent';
+
+      document.getElementById('test-result').innerHTML = `
+        <strong>Link enviado com sucesso!</strong><br>
+        Token: <code>${currentToken}</code><br>
+        O cliente pode agora abrir o link e aceitar.
+      `;
+      LOG('Link da proposta gerado e snapshot salvo (igual ao app real)');
+    }
+
+    function copyLink() {
+      const link = document.getElementById('proposal-link').textContent;
+      navigator.clipboard.writeText(link).then(() => {
+        alert('Link copiado! (simula o botão no modal)');
+      }).catch(() => {
+        prompt('Copie manualmente:', link);
+      });
+    }
+
+    function simulateSendEmail() {
+      const link = document.getElementById('proposal-link').textContent;
+      alert('Simulando envio de e-mail...\n\nAssunto: Proposta Menctor para Indústria São José Ltda\n\nCorpo contém o link: ' + link + '\n\n(No app real usa sendTransactionalEmail ou mailto)');
+      LOG('E-mail simulado enviado para o cliente');
+    }
+
+    function openClientPortal() {
+      if (!currentToken) {
+        alert('Primeiro gere o link no lado do consultor!');
+        return;
+      }
+      // Show simulated client view (mimics PortalPropostaScreen)
+      const snap = JSON.parse(localStorage.getItem(`MENCTOR_PROPOSAL_${currentToken}`) || '{}');
+      
+      document.getElementById('client-company').textContent = snap.empresa || 'Empresa';
+      document.getElementById('client-value').textContent = (snap.valor || 0).toLocaleString('pt-BR');
+      document.getElementById('client-funcs').textContent = snap.funcionarios || '?';
+      document.getElementById('client-view').style.display = 'block';
+
+      // Check if already accepted
+      const accKey = `MENCTOR_PROPOSAL_ACCEPTED_${currentToken}`;
+      const existing = localStorage.getItem(accKey);
+      if (existing) {
+        document.getElementById('accept-btn').style.display = 'none';
+        document.getElementById('client-accepted').style.display = 'block';
+        document.getElementById('client-accepted').innerHTML = '✓ Já aceita anteriormente.';
+      }
+
+      LOG('Cliente abriu o portal (simulação do ?proposta=TOKEN)');
+    }
+
+    function clientAcceptProposal() {
+      if (!currentToken) return;
+
+      const accKey = `MENCTOR_PROPOSAL_ACCEPTED_${currentToken}`;
+      const payload = {
+        id: currentToken,
+        empresa: currentSnap.empresa,
+        acceptedAt: new Date().toISOString(),
+        valor: currentSnap.valor,
+        funcionarios: currentSnap.funcionarios
+      };
+      
+      localStorage.setItem(accKey, JSON.stringify(payload));
+      
+      // Dispatch event like the real portal does
+      window.dispatchEvent(new CustomEvent("menctor:proposal-accepted", { detail: payload }));
+
+      document.getElementById('accept-btn').style.display = 'none';
+      document.getElementById('client-accepted').style.display = 'block';
+      document.getElementById('client-accepted').innerHTML = 
+        `✓ Proposta aceita com sucesso!<br>acceptedAt: ${payload.acceptedAt}`;
+
+      document.getElementById('pipeline-status').innerHTML = '✅ ACEITA PELO CLIENTE';
+      document.getElementById('pipeline-status').className = 'status accepted';
+
+      document.getElementById('test-result').innerHTML = `
+        <strong style="color:#2F7D6F">TESTE PASSOU!</strong><br>
+        Cliente aceitou a proposta.<br>
+        O consultor deveria agora ver a detecção automática.
+      `;
+
+      LOG(`✅ Aceite salvo em ${accKey} + evento disparado`);
+    }
+
+    function checkConsultantDetection() {
+      if (!currentToken) {
+        alert('Gere um link primeiro!');
+        return;
+      }
+
+      const accKey = `MENCTOR_PROPOSAL_ACCEPTED_${currentToken}`;
+      const raw = localStorage.getItem(accKey);
+      
+      if (!raw) {
+        alert('Ainda não foi aceita. Clique em "Aceitar" no lado do cliente primeiro.');
+        return;
+      }
+
+      const acc = JSON.parse(raw);
+      const msg = `Detecção bem-sucedida!\n\n` +
+                  `Chave: ${accKey}\n` +
+                  `acceptedAt: ${acc.acceptedAt}\n\n` +
+                  `No app real:\n` +
+                  `- SendProposalModal mostra "✓ Cliente já aceitou"\n` +
+                  `- PropostaEtapa marca aceito=true automaticamente\n` +
+                  `- Etapa avança para Contrato`;
+
+      alert(msg);
+      LOG('Detecção verificada manualmente: ' + acc.acceptedAt);
+    }
+
+    function showStorage() {
+      const keys = Object.keys(localStorage).filter(k => 
+        k.includes('PROPOSAL') || k.includes('MENCTOR')
+      );
+      
+      let out = '';
+      keys.forEach(k => {
+        try {
+          out += `${k}\n${localStorage.getItem(k)}\n\n`;
+        } catch(e){}
+      });
+      
+      if (!out) out = 'Nenhum dado de proposta encontrado ainda.';
+      
+      const w = window.open('', '_blank');
+      w.document.write(`<pre style="font-family:monospace;white-space:pre-wrap">${out}</pre>`);
+    }
+
+    function resetTest() {
+      const keys = Object.keys(localStorage).filter(k => 
+        k.includes('PROPOSAL') || k.includes('MENCTOR_PROPOSAL')
+      );
+      keys.forEach(k => localStorage.removeItem(k));
+      
+      document.getElementById('consultant-link-area').style.display = 'none';
+      document.getElementById('client-view').style.display = 'none';
+      document.getElementById('pipeline-status').innerHTML = 'Aguardando envio';
+      document.getElementById('pipeline-status').className = 'status';
+      document.getElementById('test-result').innerHTML = 'Teste resetado. Gere um novo link.';
+      document.getElementById('logs').innerHTML = '';
+      
+      currentToken = null;
+      currentSnap = null;
+      alert('localStorage de propostas limpo.');
+    }
+
+    // Auto-inject some global helpers (same idea as the real app)
+    window.__TEST_SEND_PROPOSAL = () => {
+      consultantSendProposal();
+      return document.getElementById('proposal-link').textContent;
+    };
+    
+    window.__TEST_ACCEPT_PROPOSAL = (token) => {
+      if (!token && currentToken) token = currentToken;
+      if (!token) return 'Gere o link primeiro';
+      const accKey = `MENCTOR_PROPOSAL_ACCEPTED_${token}`;
+      const p = { id: token, acceptedAt: new Date().toISOString() };
+      localStorage.setItem(accKey, JSON.stringify(p));
+      window.dispatchEvent(new CustomEvent("menctor:proposal-accepted", {detail: p}));
+      return 'Aceitação simulada para ' + token;
+    };
+
+    console.log('%c[Teste Proposta] Helpers prontos: window.__TEST_SEND_PROPOSAL() e window.__TEST_ACCEPT_PROPOSAL()', 'color:#666');
+
+    // Initial message
+    document.getElementById('logs').innerHTML = 'Pronto para teste. Clique em "Enviar link da proposta" no lado esquerdo.<br>';
+  </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "menctor",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "."],
+      "port": 3000,
+      "autoPort": true
+    },
+    {
+      "name": "menctor-backend",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["server.py"],
+      "port": 5000
+    }
+  ]
+}

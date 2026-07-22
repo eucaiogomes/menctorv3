@@ -1,0 +1,813 @@
+/* ============================================================
+   MENCTOR — Sui Design System (light, clean)
+   Buttons, cards, inputs, nav, motion
+   ============================================================ */
+
+/* Base overrides for light */
+html, body, #root {
+  background: var(--bg) !important;
+  color: var(--text);
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  min-height: 100vh;
+}
+
+* { box-sizing: border-box; }
+
+/* === LECTOR BUTTONS (orange brand) === */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 38px; padding: 0 16px;
+  font-size: 13.5px; font-weight: 600;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: #ffffff;
+  color: var(--text);
+  transition: all .2s cubic-bezier(.4,0,.2,1);
+  white-space: nowrap;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(10,23,48,0.04);
+}
+.btn:hover {
+  background: var(--surface-2);
+  border-color: var(--accent);
+  color: var(--text);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary,
+.btn-accent,
+.btn-health {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(246,107,10,0.32);
+}
+.btn-primary:hover,
+.btn-accent:hover,
+.btn-health:hover {
+  background: #EE5A00;
+  border-color: #EE5A00;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(246,107,10,0.42);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+.btn-ghost:hover {
+  background: var(--surface-2);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-soft {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  box-shadow: none;
+  border-radius: 999px;
+}
+.btn-soft:hover {
+  background: #E7EAF1;
+  border-color: var(--border-strong);
+}
+
+/* Arrow buttons (Sui reference pattern) */
+.btn-arrow,
+.button-block_arrow,
+.home-sf_arrow-button {
+  position: relative;
+  overflow: hidden;
+}
+.btn-arrow svg,
+.button-block_arrow svg {
+  transition: transform var(--duration-fast) var(--cubic-default);
+}
+.btn-arrow:hover svg,
+.button-block_arrow:hover svg {
+  transform: translateX(3px);
+}
+
+/* === CARDS & SURFACES — Lector === */
+.card,
+.card-line {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-card);
+}
+.card:hover,
+.card-line:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-pop);
+  border-color: #E7EAF1;
+}
+
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px -8px rgba(10,20,40,0.1);
+}
+
+/* Top nav style (inspired by Lector) */
+.frosted {
+  background: #FAFBFD;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #E7EAF1;
+}
+
+/* === SIDEBAR NAV — iOS pill style === */
+.nav-item {
+  display: flex; align-items: center; gap: 11px;
+  width: 100%;
+  padding: 9px 12px;
+  margin-bottom: 2px;
+  border-radius: 12px;
+  font-size: 13.5px; font-weight: 550;
+  letter-spacing: -0.005em;
+  color: var(--ink-soft);
+  text-align: left;
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease, box-shadow .18s ease, transform .12s ease;
+}
+.nav-item:hover {
+  background: rgba(14, 39, 72, 0.045);
+  color: #0E2748;
+}
+.nav-item:active {
+  transform: scale(0.985);
+  background: rgba(14, 39, 72, 0.07);
+}
+.nav-item.is-active {
+  background: #FFFFFF;
+  color: #F66B0A;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(10, 23, 48, 0.07), 0 0 0 1px rgba(14, 39, 72, 0.05);
+}
+.nav-item.is-active .icon { color: #F66B0A; }
+
+/* === INPUTS — Lector === */
+input, textarea, select {
+  background: #ffffff;
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: border-color .2s ease;
+}
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+  border-color: #F66B0A;
+  box-shadow: 0 0 0 3px rgba(246,107,10,0.12);
+}
+input::placeholder { color: var(--ink-faint); }
+
+/* === PILLS / BADGES — Lector === */
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px; font-weight: 700;
+  background: var(--surface-2);
+  color: var(--ink-soft);
+  border: 1px solid var(--border);
+  letter-spacing: .02em;
+}
+.pill-amber   { background: var(--amber-soft); color: #7C5A00; border-color: #FFE8A3; }
+.pill-coral   { background: var(--coral-soft); color: #9F1F24; border-color: #FAD3D4; }
+.pill-sky     { background: var(--sky-soft); color: #1E4A9E; border-color: #C5D9F7; }
+.pill-neutral { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border); }
+.pill-brand   { background: #FFF4EC; color: #F66B0A; border-color: #FFE3CF; }
+
+.dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; background: currentColor; }
+
+/* === SEG (segmented) — Lector === */
+.seg {
+  display: inline-flex; align-items: center; gap: 2px;
+  flex-wrap: wrap;
+  padding: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+.seg-item {
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 12.5px; font-weight: 600;
+  color: var(--ink-muted);
+  transition: all .15s ease;
+}
+.seg-item.is-active {
+  background: #FFFFFF;
+  color: #F66B0A;
+  box-shadow: 0 1px 2px rgba(10,23,48,0.08);
+  font-weight: 700;
+}
+
+/* === TABLES (light) === */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+th {
+  text-align: left;
+  font-weight: 700;
+  color: var(--ink-muted);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+tr:hover td { background: #F7F8FA; }
+
+/* Status dots / labels */
+.status-dot { width: 8px; height: 8px; border-radius: 999px; display: inline-block; margin-right: 6px; }
+.status-ok { background: #22c55e; }
+.status-warn { background: #f0c36b; }
+.status-bad { background: #ff6b6b; }
+
+/* === POPOVER / MODAL — Lector === */
+.popover {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-pop);
+  backdrop-filter: blur(16px);
+}
+.modal, .sheet {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-modal);
+}
+
+/* Animations */
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.popover { animation: pop-in 0.2s var(--cubic-default); }
+
+/* === MISC === */
+.tnum { font-variant-numeric: tabular-nums; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+
+/* Lector style dividers */
+.ds-section { border-bottom: 1px solid var(--border); }
+
+/* Typography helpers from DS */
+.ts-12px { font-size: 12px; line-height: 1rem; }
+.ts-14px { font-size: 14px; line-height: 1.25rem; }
+.ts-16px { font-size: 16px; line-height: 1.4rem; }
+.mono { font-family: var(--font-mono); }
+.all-caps { text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* ============================================================
+   PREMIUM DASHBOARD MOTION — Linear/Stripe-style entrance & micro-interactions
+   Colors untouched — motion + depth only.
+   ============================================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes popScale {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmerSweep {
+  from { background-position: -120% 0; }
+  to   { background-position: 220% 0; }
+}
+
+.dash-in {
+  animation: fadeInUp .55s cubic-bezier(.16,1,.3,1) both;
+}
+.dash-pop {
+  animation: popScale .5s cubic-bezier(.16,1,.3,1) both;
+}
+
+/* KPI icon micro-interaction on card hover */
+.kpi-icon {
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+.card:hover .kpi-icon {
+  transform: scale(1.08) rotate(-4deg);
+}
+
+/* Animated progress / risk bars */
+.bar-fill {
+  transition: width 1s cubic-bezier(.16,1,.3,1);
+}
+
+/* Alert row micro-lift */
+.alert-row {
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.alert-row:hover {
+  transform: translateX(3px);
+  box-shadow: 0 4px 14px rgba(10,20,40,0.07);
+}
+
+/* Filter chip press feedback */
+.chip-btn {
+  transition: all .15s cubic-bezier(.4,0,.2,1);
+}
+.chip-btn:active {
+  transform: scale(0.96);
+}
+
+/* Subtle premium card elevation upgrade — deeper, softer on hover */
+.card {
+  will-change: transform;
+}
+
+/* Glassmorphism variant for dashboard cards */
+.card-glass {
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow:
+    0 1px 2px rgba(10, 23, 48, 0.04),
+    0 8px 24px -12px rgba(10, 23, 48, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: transform .25s cubic-bezier(.16,1,.3,1),
+              box-shadow .25s cubic-bezier(.16,1,.3,1),
+              background .25s ease,
+              border-color .25s ease;
+}
+.card-glass:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(246, 107, 10, 0.28);
+  box-shadow:
+    0 2px 4px rgba(10, 23, 48, 0.05),
+    0 18px 40px -14px rgba(10, 23, 48, 0.18),
+    0 0 0 1px rgba(246, 107, 10, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Small polish */
+a:hover { color: #F66B0A; }
+
+/* === Side detail panel (right-side drawer) === */
+@keyframes panel-scrim-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes panel-slide-in {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+.side-panel-scrim {
+  position: fixed; inset: 0; z-index: 9998;
+  background: rgba(10, 20, 40, 0.32);
+  animation: panel-scrim-in 180ms ease-out both;
+}
+.side-panel {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 9999;
+  width: 440px; max-width: 100vw;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow-modal);
+  display: flex; flex-direction: column;
+  animation: panel-slide-in 260ms cubic-bezier(.16,1,.3,1) both;
+}
+@media (max-width: 640px) {
+  .side-panel { width: 100vw; }
+}
+
+/* Logo on light background — keep natural (remove invert) */
+img[alt="Menctor"], .logo-lector { filter: none; }
+
+/* ============================================================
+   RESPONSIVE — Mobile & Tablet fixes
+   ============================================================ */
+
+/* Base shell — header on top, sidebar + content below */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #FBFAF7;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Sidebar base — fixed so it never scrolls with the page */
+.sidebar {
+  width: 236px;
+  flex-shrink: 0;
+  height: calc(100vh - 61px);
+  background: #FBFAF7;
+  border-right: 1px solid rgba(14, 39, 72, 0.06);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 14px 16px;
+  position: fixed;
+  top: 61px;
+  left: 0;
+  overflow-y: auto;
+  z-index: 40;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 901px) {
+  .main-content {
+    margin-left: 236px;
+  }
+}
+
+.sidebar-mobile-head {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 12px 18px;
+}
+
+@media (max-width: 900px) {
+  .sidebar-mobile-head {
+    display: flex;
+  }
+}
+
+/* Mobile drawer behavior */
+@media (max-width: 900px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 120;
+    background: #FAFBFD;
+    box-shadow: 4px 0 20px rgba(10, 23, 48, 0.12);
+    transform: translateX(-100%);
+    will-change: transform;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 23, 48, 0.35);
+    z-index: 110;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s ease;
+  }
+
+  .sidebar-overlay.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Make main content full width on mobile */
+  .main-content {
+    margin-left: 0 !important;
+  }
+}
+
+/* App header — iOS-style frosted glass bar, full width above sidebar */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 61px;
+  padding: 0 24px;
+  border-bottom: 1px solid rgba(14, 39, 72, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 150;
+}
+
+.app-header-logo {
+  display: flex;
+  align-items: center;
+}
+
+.app-header-user-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 10px 5px 14px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.app-header-user-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(14, 39, 72, 0.08);
+  box-shadow: 0 1px 3px rgba(10, 23, 48, 0.06);
+}
+
+.app-header-user-btn:active {
+  transform: scale(0.98);
+}
+
+.app-header-user-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.25;
+}
+
+.app-header-user-name {
+  font-size: 13px;
+  font-weight: 650;
+  color: #0E2748;
+  letter-spacing: -0.01em;
+}
+
+.app-header-user-role {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: #838DA0;
+  letter-spacing: 0.01em;
+}
+
+.app-header-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: linear-gradient(145deg, #FF8A3C 0%, #F66B0A 55%, #E05500 100%);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(246, 107, 10, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+}
+
+@media (max-width: 640px) {
+  .app-header {
+    padding: 0 14px;
+    height: 56px;
+  }
+}
+
+/* Main content area */
+.main-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TopBar responsive */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 0;
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .topbar {
+    padding: 12px 16px 0;
+    flex-wrap: wrap;
+  }
+
+  .topbar .title-area {
+    order: 3;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .topbar .actions {
+    margin-left: 0;
+  }
+}
+
+/* Hamburger button */
+.hamburger {
+  display: none;
+  width: 38px;
+  height: 38px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: #F6F7FA;
+  border-radius: 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-right: 10px;
+  transition: background .15s ease, transform .1s ease;
+}
+
+.hamburger svg {
+  transition: transform .2s var(--ease-spring, ease-out);
+}
+
+.hamburger.open svg {
+  transform: rotate(90deg);
+}
+
+.hamburger:hover {
+  background: #EDEFF4;
+}
+
+.hamburger:active {
+  transform: scale(0.92);
+}
+
+@media (max-width: 900px) {
+  .hamburger {
+    display: inline-flex;
+  }
+}
+
+/* Content padding responsive */
+.page-content {
+  padding: 16px 20px 40px;
+}
+
+@media (min-width: 901px) {
+  .page-content {
+    padding: 18px 28px 40px;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-content {
+    padding: 16px 16px 40px;
+  }
+}
+
+/* Tables scroll on small screens */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  min-width: 560px; /* prevent extreme squeeze */
+}
+
+@media (max-width: 640px) {
+  table {
+    min-width: 480px;
+    font-size: 13px;
+  }
+}
+
+/* Cards and grids */
+@media (max-width: 640px) {
+  .card {
+    border-radius: 12px;
+  }
+}
+
+/* Role switcher on mobile */
+.role-switcher {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 200;
+}
+
+@media (max-width: 900px) {
+  .role-switcher {
+    top: 10px;
+    right: 10px;
+  }
+}
+
+/* Breadcrumb and titles */
+@media (max-width: 640px) {
+  .display {
+    font-size: 24px !important;
+  }
+}
+
+/* Hide less important things on very small */
+@media (max-width: 480px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+}
+
+/* Buttons get smaller touch targets */
+@media (max-width: 640px) {
+  .btn {
+    height: 36px;
+    font-size: 13px;
+    padding: 0 12px;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   HOME / VISÃO GERAL — desktop grid containers extracted into
+   classes so the mobile layer below can override them without
+   touching desktop (inline styles win over CSS, so these base
+   values must mirror the previous inline ones at >=641px).
+   ════════════════════════════════════════════════════════════ */
+.home-kpi-grid { display: grid; grid-template-columns: 1.5fr 1fr 1.15fr 1.15fr 1fr; gap: 12px; margin-bottom: 14px; }
+.home-main-grid { display: grid; grid-template-columns: 1.72fr 1fr; gap: 14px; align-items: start; }
+.home-intel-grid { display: grid; grid-template-columns: 1fr 1.35fr 1fr; gap: 12px; }
+.home-table-header, .home-table-row { grid-template-columns: minmax(170px, 1.6fr) 100px 90px 82px 76px 110px; }
+.home-row-chevron-mobile { display: none; align-items: center; justify-content: center; }
+
+/* Mobile — iOS-app-style layout for Visão Geral only (desktop untouched) */
+@media (max-width: 640px) {
+  /* KPI row -> horizontal scroll-snap carousel (iOS widget style) */
+  .home-kpi-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin: 0 -16px 14px;
+    padding: 0 16px 4px;
+  }
+  .home-kpi-grid::-webkit-scrollbar { display: none; }
+  .home-kpi-grid > * { scroll-snap-align: start; flex: 0 0 80%; min-width: 80%; }
+
+  /* Main 2-col + intelligence 3-col -> single column */
+  .home-main-grid, .home-intel-grid { grid-template-columns: 1fr; }
+  /* Grid items default to min-width:auto, letting long content (e.g. the risk filter chips)
+     push the whole card wider than the viewport instead of scrolling internally. */
+  .home-main-grid > *, .home-intel-grid > * { min-width: 0; }
+
+  /* Section titles shrink back down (global .display !important rule bumps them to 24px otherwise) */
+  .home-section-title { font-size: 17px !important; }
+
+  /* Risk filter chips -> contained horizontal scroll, never overflow the page */
+  .home-risk-filter { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; max-width: 100%; }
+  .home-risk-filter::-webkit-scrollbar { display: none; }
+  .home-risk-filter .chip-btn { flex-shrink: 0; }
+
+  /* Client table -> native iOS list row: avatar + name, index, chevron */
+  .home-table-header { display: none !important; }
+  .home-table-row { grid-template-columns: 1fr auto auto; gap: 8px; }
+  .home-col-lastdiag, .home-col-variation, .home-col-score, .home-col-actions-desktop { display: none !important; }
+  .home-row-chevron-mobile { display: flex !important; }
+  .home-table-row:active { background: var(--surface-2); }
+
+  /* Hero actions -> stacked full-width buttons (avoids uneven flex-shrink overflow), 44px touch target */
+  .home-hero-actions { width: 100%; flex-direction: column; }
+  .home-hero-actions .btn { width: 100%; height: 44px !important; justify-content: center; }
+
+  /* Footer quick actions -> horizontal scroll-snap chip row (iOS Shortcuts style) */
+  .home-quickactions {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    margin: 0 -16px;
+    padding: 0 16px 4px;
+  }
+  .home-quickactions::-webkit-scrollbar { display: none; }
+  .home-quickactions .btn { scroll-snap-align: start; flex-shrink: 0; height: 44px !important; }
+  .home-quickactions-spacer, .home-sync-status { display: none !important; }
+
+  /* Alert action buttons -> meet touch target minimum */
+  .home-alert-action { height: 44px !important; padding: 0 14px !important; }
+}

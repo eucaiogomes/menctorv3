@@ -1,0 +1,299 @@
+-- =====================================================
+-- SCRIPT COMPLETO PARA SUPABASE - Menctor (Clientes + Etapas + Cadastro)
+-- Copie TODO este conteúdo e cole no SQL Editor do Supabase
+-- Depois clique em "Run" ou pressione Ctrl+Enter
+-- =====================================================
+
+-- 1. Extensão necessária
+create extension if not exists "uuid-ossp";
+
+-- 2. Função para atualizar updated_at automaticamente
+create or replace function public.handle_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+-- =====================================================
+-- 3. TABELA: steps (definição das 7 etapas)
+-- =====================================================
+create table if not exists public.steps (
+  id uuid primary key default gen_random_uuid(),
+  number int not null unique,
+  label text not null,
+  description text,
+  created_at timestamptz default now()
+);
+
+comment on table public.steps is 'Definição estática das 7 etapas do projeto.';
+
+-- Seed das 7 etapas (só insere se não existir)
+insert into public.steps (number, label, description)
+values
+  (1, 'Cadastro', 'Dados completos da empresa e contexto de riscos psicossociais'),
+  (2, 'Proposta', 'Visualizar proposta e enviar link para aceite do cliente'),
+  (3, 'Contrato', 'Contrato com aceite digital do cliente'),
+  (4, 'Sensibilização', 'Palestra, treinamento e trilha'),
+  (5, 'Diagnóstico', 'Seleção de instrumentos: COPSOQ II, DRPS e Clima'),
+  (6, 'Relatórios', 'Disponível após diagnóstico'),
+  (7, 'Apresentação', 'Reunião de discussão do plano de ação')
+on conflict (number) do nothing;
+
+-- =====================================================
+-- 4. TABELA: clients (clientes/empresas)
+-- =====================================================
+create table if not exists public.clients (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  cnpj text,
+  contact text,
+  email text,
+  phone text,
+  sector text,
+  employees int,
+  mrr numeric(12,2),
+  color text default '#2F7D6F',
+  status text default 'ativo' check (status in ('ativo','negociacao','pausado','concluido')),
+  current_step int default 1 references public.steps(number),
+  next_action text,
+  last_interaction_at timestamptz,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now(),
+  deleted_at timestamptz
+);
+
+create index if not exists idx_clients_status on public.clients(status);
+create index if not exists idx_clients_current_step on public.clients(current_step);
+create index if not exists idx_clients_mrr on public.clients(mrr);
+
+-- CORRIGIDO: usar DROP + CREATE para triggers (PostgreSQL não suporta IF NOT EXISTS em CREATE TRIGGER)
+drop trigger if exists clients_updated_at on public.clients;
+create trigger clients_updated_at
+  before update on public.clients
+  for each row execute function public.handle_updated_at();
+
+comment on table public.clients is 'Clientes com dados básicos e etapa atual.';
+
+-- =====================================================
+-- 5. TABELA: client_step_progress (progresso por etapa)
+-- =====================================================
+create table if not exists public.client_step_progress (
+  id uuid primary key default gen_random_uuid(),
+  client_id uuid not null references public.clients(id) on delete cascade,
+  step_number int not null references public.steps(number),
+  status text default 'pendente' check (status in ('pendente','em_andamento','concluida','bloqueada')),
+  data jsonb default '{}'::jsonb,
+  started_at timestamptz,
+  completed_at timestamptz,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now(),
+  unique (client_id, step_number)
+);
+
+create index if not exists idx_client_step_progress_client on public.client_step_progress(client_id);
+create index if not exists idx_client_step_progress_step on public.client_step_progress(step_number);
+create index if not exists idx_client_step_progress_status on public.client_step_progress(status);
+
+drop trigger if exists client_step_progress_updated_at on public.client_step_progress;
+create trigger client_step_progress_updated_at
+  before update on public.client_step_progress
+  for each row execute function public.handle_updated_at();
+
+comment on table public.client_step_progress is 'Estado de cada etapa para cada cliente. O campo data guarda o que foi preenchido.';
+
+-- =====================================================
+-- 6. TABELA: cadastro_responses (os 18 campos do formulário de Cadastro)
+-- =====================================================
+create table if not exists public.cadastro_responses (
+  id uuid primary key default gen_random_uuid(),
+  client_id uuid not null unique references public.clients(id) on delete cascade,
+
+  -- Campos do formulário (snake_case para combinar com o banco)
+  razao_social text,
+  responsavel text,
+  email text,
+  telefone text,
+  cnpj text,
+
+  qtd_por_area jsonb default '{}'::jsonb,
+  qtd_cargos int,
+  segmento text,
+  unidades text,
+  cidades text,
+  terceirizados text,
+
+  possui text[] default '{}',
+  indicadores text[] default '{}',
+
+  mapeamento_formal text,
+  pesquisa_clima text,
+  canais_escuta text,
+  fiscalizacao_evidencia text,
+  gestao_riscos_outra text,
+
+  pressao_metas text,
+  ritmo_intenso text,
+  capacitacao_lideranca text,
+  conflitos_recorrentes text,
+  assedio_moral text,
+  lideranca_outra text,
+
+  juridico_acompanha text,
+  acao_trabalhista_mental text,
+  sente_protegida text,
+  juridica_outra text,
+
+  excesso_trabalho boolean,
+  prazos_inalcancaveis boolean,
+  falta_controle boolean,
+  estrutura_nao_aplica boolean,
+  estrutura_outra text,
+
+  trabalha_com text[] default '{}',
+
+  submitted_at timestamptz,
+  form_token text,
+
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+drop trigger if exists cadastro_responses_updated_at on public.cadastro_responses;
+create trigger cadastro_responses_updated_at
+  before update on public.cadastro_responses
+  for each row execute function public.handle_updated_at();
+
+create index if not exists idx_cadastro_client on public.cadastro_responses(client_id);
+
+comment on table public.cadastro_responses is 'Respostas completas do formulário de Cadastro (18 perguntas).';
+
+-- =====================================================
+-- 7. TABELA: documents (propostas, contratos, relatórios)
+-- =====================================================
+create table if not exists public.documents (
+  id uuid primary key default gen_random_uuid(),
+  client_id uuid not null references public.clients(id) on delete cascade,
+  step_number int references public.steps(number),
+  type text check (type in ('proposta','contrato','relatorio','outro')),
+  title text,
+  url text,
+  status text default 'enviado' check (status in ('enviado','visualizado','assinado','rejeitado')),
+  sent_at timestamptz default now(),
+  signed_at timestamptz,
+  metadata jsonb default '{}'::jsonb,
+  created_at timestamptz default now()
+);
+
+create index if not exists idx_documents_client on public.documents(client_id);
+
+-- =====================================================
+-- 8. TABELA: events (histórico simples)
+-- =====================================================
+create table if not exists public.events (
+  id uuid primary key default gen_random_uuid(),
+  client_id uuid not null references public.clients(id) on delete cascade,
+  event_type text not null,
+  step_number int,
+  description text,
+  payload jsonb default '{}'::jsonb,
+  created_at timestamptz default now()
+);
+
+create index if not exists idx_events_client on public.events(client_id, created_at desc);
+create index if not exists idx_events_type on public.events(event_type);
+
+comment on table public.events is 'Histórico de mudanças nas etapas e cadastro.';
+
+-- =====================================================
+-- 9. ROW LEVEL SECURITY (RLS) - IMPORTANTE PARA O APP FUNCIONAR
+-- =====================================================
+
+-- Habilita RLS
+alter table public.clients enable row level security;
+alter table public.client_step_progress enable row level security;
+alter table public.cadastro_responses enable row level security;
+alter table public.documents enable row level security;
+alter table public.events enable row level security;
+
+-- Policies para anon (frontend) - MODO DEMO
+-- Remova ou restrinja essas policies em produção
+drop policy if exists "Anon full (demo)" on public.clients;
+drop policy if exists "Anon full (demo)" on public.client_step_progress;
+drop policy if exists "Anon full (demo)" on public.cadastro_responses;
+drop policy if exists "Anon full (demo)" on public.documents;
+drop policy if exists "Anon full (demo)" on public.events;
+
+create policy "Anon full (demo)" on public.clients for all to anon using (true) with check (true);
+create policy "Anon full (demo)" on public.client_step_progress for all to anon using (true) with check (true);
+create policy "Anon full (demo)" on public.cadastro_responses for all to anon using (true) with check (true);
+create policy "Anon full (demo)" on public.documents for all to anon using (true) with check (true);
+create policy "Anon full (demo)" on public.events for all to anon using (true) with check (true);
+
+-- =====================================================
+-- 10. VIEW ÚTIL
+-- =====================================================
+create or replace view public.client_overview as
+select 
+  c.id,
+  c.name,
+  c.company_name,
+  c.status,
+  c.current_step,
+  s.label as current_step_label,
+  c.mrr as investimento,
+  (select count(*) from public.client_step_progress p 
+   where p.client_id = c.id and p.status = 'concluida') as etapas_concluidas,
+  c.last_interaction_at,
+  c.updated_at
+from public.clients c
+left join public.steps s on s.number = c.current_step
+where c.deleted_at is null;
+
+-- =====================================================
+-- 11. FUNÇÃO AUXILIAR PARA AVANÇAR ETAPA
+-- =====================================================
+create or replace function public.advance_client_step(
+  p_client_id uuid,
+  p_new_step int
+)
+returns void
+language plpgsql
+security definer
+as $$
+begin
+  update public.clients
+  set current_step = p_new_step,
+      updated_at = now()
+  where id = p_client_id;
+
+  insert into public.events (client_id, event_type, step_number, description)
+  values (p_client_id, 'step_changed', p_new_step, 'Etapa avançada manualmente');
+end;
+$$;
+
+-- =====================================================
+-- FIM DO SCRIPT
+-- =====================================================
+
+-- Dicas:
+-- 1. Rode este script completo no SQL Editor do Supabase.
+-- 2. Depois vá em Table Editor e confirme que as tabelas apareceram.
+-- 3. O app usa a anon key, por isso as policies "Anon full (demo)" foram criadas.
+-- 4. Se quiser resetar tudo, pode dropar as tabelas e rodar de novo.
+
+-- Tabelas criadas:
+-- - steps
+-- - clients
+-- - client_step_progress
+-- - cadastro_responses
+-- - documents
+-- - events
+
+-- View: client_overview
+-- Função: advance_client_step
+
+-- Pronto! Agora o cadastro pela UI deve funcionar com persistência no Supabase.

@@ -1,0 +1,11 @@
+{
+  "buildCommand": "echo 'Menctor System - Frontend only'",
+  "outputDirectory": ".",
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/((?!api/.*|.*\\..*).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
