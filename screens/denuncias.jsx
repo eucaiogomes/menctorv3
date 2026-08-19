@@ -631,101 +631,73 @@ const DenunciasScreen = ({ navigate }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {[
-                    {
-                      id: "den-1",
-                      protocolo: "DEN-2026-0001",
-                      natureza: "Assédio Moral",
-                      data: "15/06/2026",
-                      statusLabel: "Em Investigação",
-                      statusCor: "#F59E0B",
-                      statusBg: "#FEF3C7",
-                      responsavel: "Ana Paula (Compliance)",
-                      prazo: "14/07/2026"
-                    },
-                    {
-                      id: "den-2",
-                      protocolo: "DEN-2026-0002",
-                      natureza: "Sugestão de Melhoria",
-                      data: "01/07/2026",
-                      statusLabel: "Em Triagem",
-                      statusCor: "#2563EB",
-                      statusBg: "#DBEAFE",
-                      responsavel: "Ana Paula (Compliance)",
-                      prazo: "31/07/2026"
-                    },
-                    {
-                      id: "den-3",
-                      protocolo: "DEN-2026-0003",
-                      natureza: "Conflito de Interesses",
-                      data: "20/05/2026",
-                      statusLabel: "Concluído",
-                      statusCor: "#10B981",
-                      statusBg: "#D1FAE5",
-                      responsavel: "Ana Paula (Compliance)",
-                      prazo: "19/06/2026"
-                    },
-                    {
-                      id: "den-4",
-                      protocolo: "DEN-2026-0004",
-                      natureza: "Assédio Sexual",
-                      data: "05/08/2026",
-                      statusLabel: "Em Triagem",
-                      statusCor: "#2563EB",
-                      statusBg: "#DBEAFE",
-                      responsavel: "Ana Paula (Compliance)",
-                      prazo: "19/08/2026"
-                    }
-                  ].map((row, i) => (
-                    <tr key={row.id} style={{ borderBottom: "1px solid #F1F5F9" }}>
-                      <td style={{ padding: "14px 8px", fontWeight: 700, fontFamily: "var(--font-mono)", fontSize: 12.5, color: "#00204D" }}>
-                        {row.protocolo}
-                      </td>
-                      <td style={{ padding: "14px 8px", fontWeight: 600, color: "#0E2748" }}>
-                        {row.natureza}
-                      </td>
-                      <td style={{ padding: "14px 8px", color: "#64748B" }}>
-                        {row.data}
-                      </td>
-                      <td style={{ padding: "14px 8px" }}>
-                        <span style={{
-                          display: "inline-flex", alignItems: "center", gap: 6,
-                          fontSize: 11.5, fontWeight: 700, padding: "3px 10px", borderRadius: 999,
-                          background: row.statusBg, color: row.statusCor
-                        }}>
-                          <span style={{ width: 6, height: 6, borderRadius: "50%", background: row.statusCor }} />
-                          {row.statusLabel}
-                        </span>
-                      </td>
-                      <td style={{ padding: "14px 8px", color: "#334155" }}>
-                        {row.responsavel}
-                      </td>
-                      <td style={{ padding: "14px 8px", color: "#64748B" }}>
-                        {row.prazo}
-                      </td>
-                      <td style={{ padding: "14px 8px", textAlign: "right" }}>
-                        <button
-                          onClick={() => navigate("denuncia-detalhe", { id: row.id })}
-                          style={{
-                            height: 28,
-                            padding: "0 10px",
-                            borderRadius: 6,
-                            background: "#F8FAFC",
-                            border: "1px solid #CBD5E1",
-                            color: "#0E2748",
-                            fontSize: 11.5,
-                            fontWeight: 600,
-                            cursor: "pointer",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: 4
-                          }}
-                        >
-                          Tratar Caso ›
-                        </button>
+                  {denuncias.length === 0 && (
+                    <tr>
+                      <td colSpan={7} style={{ padding: "24px 8px", textAlign: "center", color: "#94A3B8" }}>
+                        Nenhum caso registrado até o momento.
                       </td>
                     </tr>
-                  ))}
+                  )}
+                  {denuncias
+                    .slice()
+                    .sort((a, b) => new Date(b.data) - new Date(a.data))
+                    .slice(0, 6)
+                    .map(d => {
+                      const st = DENUNCIA_STATUS[d.status];
+                      const dt = new Date(d.data);
+                      const prazoDt = d.prazoFinal ? new Date(d.prazoFinal) : null;
+
+                      return (
+                        <tr key={d.id} style={{ borderBottom: "1px solid #F1F5F9" }}>
+                          <td style={{ padding: "14px 8px", fontWeight: 700, fontFamily: "var(--font-mono)", fontSize: 12.5, color: "#00204D" }}>
+                            {d.protocolo}
+                          </td>
+                          <td style={{ padding: "14px 8px", fontWeight: 600, color: "#0E2748" }}>
+                            {d.natureza}
+                          </td>
+                          <td style={{ padding: "14px 8px", color: "#64748B" }}>
+                            {dt.toLocaleDateString("pt-BR")}
+                          </td>
+                          <td style={{ padding: "14px 8px" }}>
+                            <span style={{
+                              display: "inline-flex", alignItems: "center", gap: 6,
+                              fontSize: 11.5, fontWeight: 700, padding: "3px 10px", borderRadius: 999,
+                              background: `${st?.cor}18`, color: st?.cor
+                            }}>
+                              <span style={{ width: 6, height: 6, borderRadius: "50%", background: st?.cor }} />
+                              {st?.label}
+                            </span>
+                          </td>
+                          <td style={{ padding: "14px 8px", color: "#334155" }}>
+                            {d.responsavel || "Não atribuído"}
+                          </td>
+                          <td style={{ padding: "14px 8px", color: "#64748B" }}>
+                            {prazoDt ? prazoDt.toLocaleDateString("pt-BR") : "—"}
+                          </td>
+                          <td style={{ padding: "14px 8px", textAlign: "right" }}>
+                            <button
+                              onClick={() => navigate("denuncia-detalhe", { id: d.id })}
+                              style={{
+                                height: 28,
+                                padding: "0 10px",
+                                borderRadius: 6,
+                                background: "#F8FAFC",
+                                border: "1px solid #CBD5E1",
+                                color: "#0E2748",
+                                fontSize: 11.5,
+                                fontWeight: 600,
+                                cursor: "pointer",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: 4
+                              }}
+                            >
+                              Tratar Caso ›
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </table>
             </div>
