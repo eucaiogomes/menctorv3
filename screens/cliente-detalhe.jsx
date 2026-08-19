@@ -147,11 +147,22 @@ const ClienteDetalheScreen = ({ navigate, params = {} }) => {
           actionLabel="Abrir roadmap"
           onAction={() => navigate("roadmap", { clienteId: cliente.id })}
         />
+        <DocLinkCard
+          icon="activity"
+          title="Matriz de Risco (PGR)"
+          subtitle="Classificação 5×5 (Probabilidade × Severidade) por fator psicossocial e framework normativo"
+          status="Configurada"
+          actionLabel="Abrir matriz"
+          onAction={() => navigate("matriz-risco", { clienteId: cliente.id })}
+        />
       </div>
 
-      <div style={{ display: "flex", gap: 10 }}>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
         <button onClick={() => navigate("roadmap", { clienteId: cliente.id })} className="btn btn-primary" style={{ height: 40, fontSize: 13 }}>
           <Icon name="map" size={14} /> Gerenciar 7 Etapas do Projeto
+        </button>
+        <button onClick={() => navigate("matriz-risco", { clienteId: cliente.id })} className="btn btn-soft" style={{ height: 38, fontSize: 13, background: "var(--accent-soft)", color: "var(--accent-cta)", border: "1px solid var(--accent-light)" }}>
+          <Icon name="activity" size={13} color="var(--accent-cta)" /> Matriz de Risco (PGR)
         </button>
         <button onClick={() => navigate("plano-acao", { clienteId: cliente.id })} className="btn btn-soft" style={{ height: 38, fontSize: 13 }}>
           <Icon name="clipboard" size={13} /> Plano de Ação

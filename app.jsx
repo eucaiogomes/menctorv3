@@ -1,4 +1,4 @@
-/* global React, ReactDOM, Sidebar, AdminSidebar, HomeScreen, DiagnosticosScreen, DiagnosticoDetalheScreen, ClientesScreen, ClienteDetalheScreen, PipelineScreen, CampanhasScreen, CampanhaResponderScreen, CampanhaResultadoScreen, RelatorioDocPage, AprendizadoScreen, PortalPropostaScreen, PortalContratoScreen, AdminHome, AdminColaboradores, AdminVitrine, RelatoriosFinaisScreen, RelatoriosCredenciadoScreen, AlunoApp, LeadInviteForm, EmpresaInviteForm, RoadmapScreen, PlanoAcaoScreen, NovoClienteFullPage */
+/* global React, ReactDOM, Sidebar, AdminSidebar, HomeScreen, DiagnosticosScreen, DiagnosticoDetalheScreen, ClientesScreen, ClienteDetalheScreen, PipelineScreen, CampanhasScreen, CampanhaResponderScreen, CampanhaResultadoScreen, RelatorioDocPage, AprendizadoScreen, PortalPropostaScreen, PortalContratoScreen, AdminHome, AdminColaboradores, AdminVitrine, RelatoriosFinaisScreen, RelatoriosCredenciadoScreen, AlunoApp, LeadInviteForm, EmpresaInviteForm, RoadmapScreen, PlanoAcaoScreen, NovoClienteFullPage, EntrevistasScreen, EntrevistaDetalheScreen, MatrizRiscoScreen, DenunciasScreen, DenunciaDetalheScreen, DenunciaPortalPage */
 const { useState } = React;
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
@@ -12,6 +12,12 @@ const ROUTE_PATHS = {
   roadmap: "/roadmap",
   diagnosticos: "/diagnosticos",
   "diagnostico-detalhe": "/diagnosticos/detalhe",
+  entrevistas: "/entrevistas",
+  "entrevista-detalhe": "/entrevistas/detalhe",
+  "matriz-risco": "/matriz-risco",
+  denuncias: "/denuncias",
+  "denuncia-detalhe": "/denuncias/detalhe",
+  "denuncia-portal": "/denuncia",
   clientes: "/clientes",
   "cliente-detalhe": "/clientes/detalhe",
   pipeline: "/pipeline",
@@ -141,6 +147,11 @@ function App() {
     return <RelatorioDocPage params={route.params} />;
   }
 
+  // ─── DENUNCIA PORTAL — standalone public whistleblower portal ────
+  if (route.screen === "denuncia-portal") {
+    return <DenunciaPortalPage navigate={navigate} params={route.params} />;
+  }
+
   // ─── ALUNO experience: own shell, no sidebar ──────────────
   if (role === "aluno") {
     return (
@@ -197,9 +208,11 @@ function App() {
       <div className="app-body">
       <Sidebar
         active={
+          route.screen.startsWith("entrevista") ? "entrevistas" :
+          route.screen.startsWith("denuncia") ? "denuncias" :
           route.screen.startsWith("diagnostico") ? "diagnosticos" :
           route.screen === "campanha-resultado" ? "campanhas" :
-          ["roadmap", "cadastro-cliente", "plano-acao", "relatorios", "cliente-detalhe"].includes(route.screen) ? "clientes" :
+          ["roadmap", "cadastro-cliente", "plano-acao", "relatorios", "cliente-detalhe", "matriz-risco"].includes(route.screen) ? "clientes" :
           route.screen
         }
         onNavigate={(s) => navigate(s)}
@@ -219,6 +232,11 @@ function App() {
           )}
           {route.screen === "diagnosticos"       && <DiagnosticosScreen       navigate={navigate} initialCreate={route.params.create} />}
           {route.screen === "diagnostico-detalhe"&& <DiagnosticoDetalheScreen navigate={navigate} avaliacao={route.params.avaliacao} cliente={route.params.cliente} />}
+          {route.screen === "entrevistas"        && <EntrevistasScreen        navigate={navigate} />}
+          {route.screen === "entrevista-detalhe" && <EntrevistaDetalheScreen navigate={navigate} params={route.params} id={route.params.id} />}
+          {route.screen === "matriz-risco"       && <MatrizRiscoScreen       navigate={navigate} params={route.params} clienteId={route.params.clienteId} />}
+          {route.screen === "denuncias"          && <DenunciasScreen          navigate={navigate} />}
+          {route.screen === "denuncia-detalhe"   && <DenunciaDetalheScreen   navigate={navigate} params={route.params} id={route.params.id} />}
           {route.screen === "clientes"           && <ClientesScreen           navigate={navigate} />}
           {route.screen === "cliente-detalhe"    && <ClienteDetalheScreen     navigate={navigate} params={route.params} />}
           {route.screen === "pipeline"           && <PipelineScreen           navigate={navigate} />}

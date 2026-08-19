@@ -506,8 +506,724 @@ const ETAPAS_CLIENTE = {
   },
 };
 
+// ════════════════════════════════════════════════════════════
+// FRENTE 1 — ENTREVISTAS DE AVALIAÇÃO DOS FATORES DE RISCOS PSICOSSOCIAIS
+// ════════════════════════════════════════════════════════════
+
+const ENTREVISTA_ESTRUTURAS = [
+  { id: "relacoes",      numero: 1, label: "Estrutura dos Modelos Relacionais", short: "Relações" },
+  { id: "atividades",    numero: 2, label: "Estrutura das Atividades",          short: "Atividades" },
+  { id: "organizacional",numero: 3, label: "Estrutura Organizacional",          short: "Organizacional" },
+];
+
+const ENTREVISTA_FATORES = [
+  // ── 1. Relações ──
+  {
+    id: "assedio", estruturaId: "relacoes", numero: "1.1",
+    nome: "Assédio Moral ou Sexual",
+    objetivo: "Avaliar a existência de comportamentos repetitivos de humilhação, intimidação, constrangimento, abuso de autoridade, assédio moral ou assédio sexual que possam comprometer a dignidade, a segurança psicológica, o bem-estar e a saúde mental dos trabalhadores.",
+    perguntas: [
+      "Você já presenciou ou vivenciou situações de humilhação, desrespeito, constrangimento, abuso de autoridade ou assédio moral ou sexual no ambiente de trabalho?",
+      "Quando essas situações acontecem, como a liderança ou a empresa costuma agir?",
+      "Você acredita que as pessoas se sentem seguras para denunciar situações de assédio ou comportamentos inadequados sem medo de sofrer represálias?",
+      "Na sua percepção, a empresa deixa claro que comportamentos de assédio ou desrespeito são inaceitáveis?",
+      "Você considera que o ambiente de trabalho promove relações baseadas no respeito, na ética e na dignidade entre líderes e colaboradores?"
+    ],
+    aprofundamento: [
+      "Esses comportamentos são isolados ou recorrentes?",
+      "Quem praticou o comportamento?",
+      "Houve testemunhas?",
+      "A empresa tomou alguma providência?",
+      "O colaborador recebeu apoio?",
+      "O comportamento continua acontecendo?",
+      "Outras pessoas já relataram situações semelhantes?",
+      "O fato impactou sua saúde ou seu desempenho?"
+    ],
+    evidencias: [
+      "Relatos recorrentes de assédio moral",
+      "Relatos de assédio sexual",
+      "Humilhações públicas",
+      "Abuso de autoridade",
+      "Cobranças constrangedoras",
+      "Medo de denunciar",
+      "Omissão da liderança",
+      "Queixas registradas no RH"
+    ],
+    notaTecnica: "O assédio moral e o assédio sexual representam um dos mais graves fatores de risco psicossocial nas organizações. A avaliação deve considerar não apenas relatos explícitos de violência, mas também comportamentos repetitivos que exponham trabalhadores a situações de humilhação, intimidação, isolamento, ameaças, constrangimento ou abuso de autoridade.",
+  },
+  {
+    id: "relacoes_interpessoais", estruturaId: "relacoes", numero: "1.2",
+    nome: "Más Relações Interpessoais",
+    objetivo: "Avaliar a qualidade das relações interpessoais entre os trabalhadores, verificando a existência de cooperação, respeito, confiança, comunicação saudável e espírito de equipe.",
+    perguntas: [
+      "Como você descreve o relacionamento entre os colegas de trabalho no seu setor?",
+      "Na sua percepção, existe respeito mútuo e colaboração entre os colaboradores durante a realização das atividades?",
+      "Quando surgem conflitos entre colegas ou equipes, como eles costumam ser resolvidos?",
+      "Você sente que existe confiança entre os colaboradores ou percebe um ambiente marcado por competição excessiva, conflitos ou isolamento?",
+      "Na sua opinião, o ambiente de trabalho favorece relações saudáveis e cooperativas? Por quê?"
+    ],
+    aprofundamento: [
+      "Os conflitos são frequentes?",
+      "Eles costumam envolver quais áreas ou pessoas?",
+      "Existe diálogo para resolver os problemas?",
+      "Os colaboradores costumam ajudar uns aos outros?",
+      "Há grupos isolados dentro da empresa?",
+      "Existe rivalidade entre equipes?",
+      "O ambiente favorece a confiança?",
+      "Como esses relacionamentos afetam seu trabalho?"
+    ],
+    evidencias: [
+      "Conflitos frequentes",
+      "Baixa cooperação",
+      "Competição excessiva",
+      "Isolamento entre colaboradores",
+      "Comunicação hostil",
+      "Ambiente de desconfiança",
+      "Dificuldade de integração",
+      "Reclamações recorrentes"
+    ],
+    notaTecnica: "As relações interpessoais representam um dos principais fatores de proteção da saúde mental no ambiente de trabalho. Equipes que mantêm relações baseadas na confiança, no respeito e na cooperação tendem a apresentar maior engajamento, melhor comunicação e menor ocorrência de conflitos.",
+  },
+  {
+    id: "apoio_social", estruturaId: "relacoes", numero: "1.3",
+    nome: "Falta de Apoio Social",
+    objetivo: "Avaliar a percepção dos trabalhadores quanto ao apoio recebido da liderança, dos colegas e da própria organização para o desempenho de suas atividades, resolução de dificuldades e enfrentamento de situações de pressão ou adversidade.",
+    perguntas: [
+      "Quando você enfrenta dificuldades no trabalho, sente que pode contar com o apoio da sua liderança e dos seus colegas?",
+      "Na sua percepção, existe colaboração entre os membros da equipe ou cada colaborador precisa resolver seus problemas sozinho?",
+      "Quando um colaborador passa por dificuldades pessoais ou profissionais, como a empresa e a liderança costumam agir?",
+      "Você sente liberdade para pedir ajuda quando necessário, sem receio de julgamentos, críticas ou consequências negativas?",
+      "De maneira geral, você considera que trabalha em um ambiente acolhedor, colaborativo e que incentiva o apoio entre as pessoas? Por quê?"
+    ],
+    aprofundamento: [
+      "Quem normalmente oferece ajuda quando surgem dificuldades?",
+      "A liderança demonstra disponibilidade para ouvir os colaboradores?",
+      "Existe cooperação entre os colegas?",
+      "Você já deixou de pedir ajuda por medo ou vergonha?",
+      "Os novos colaboradores recebem apoio durante sua integração?",
+      "Como a empresa reage quando alguém apresenta dificuldades emocionais?",
+      "Você sente que faz parte da equipe?"
+    ],
+    evidencias: [
+      "Baixa colaboração entre equipes",
+      "Isolamento dos trabalhadores",
+      "Liderança pouco acessível",
+      "Dificuldade para solicitar ajuda",
+      "Ambiente individualista",
+      "Falta de integração",
+      "Ausência de acolhimento",
+      "Baixo senso de pertencimento"
+    ],
+    notaTecnica: "O apoio social representa um dos principais fatores de proteção contra os riscos psicossociais. Trabalhadores que percebem disponibilidade da liderança e colaboração entre colegas tendem a enfrentar situações de pressão com maior resiliência, reduzindo os impactos negativos sobre a saúde mental.",
+  },
+  {
+    id: "lideranca_abusiva", estruturaId: "relacoes", numero: "1.4",
+    nome: "Liderança Abusiva",
+    objetivo: "Avaliar se as práticas de liderança adotadas pela organização promovem respeito, desenvolvimento, apoio e segurança psicológica ou se apresentam comportamentos abusivos, autoritários, intimidatórios ou desrespeitosos capazes de comprometer a saúde mental dos trabalhadores.",
+    perguntas: [
+      "Como você descreveria a forma como sua liderança conduz a equipe no dia a dia?",
+      "Você sente que sua liderança trata os colaboradores com respeito, imparcialidade e profissionalismo?",
+      "Quando ocorrem erros ou dificuldades, como a liderança costuma agir? Ela orienta, apoia e busca soluções ou utiliza críticas, ameaças, constrangimentos ou exposição pública?",
+      "Você se sente à vontade para conversar com sua liderança, apresentar sugestões, esclarecer dúvidas ou comunicar problemas sem receio de sofrer consequências negativas?",
+      "Na sua percepção, a liderança contribui para um ambiente de trabalho saudável e seguro ou acaba aumentando o estresse e a pressão sobre a equipe?"
+    ],
+    aprofundamento: [
+      "Como a liderança costuma cobrar resultados?",
+      "É comum elevar o tom de voz durante as cobranças?",
+      "Existem ameaças relacionadas ao emprego?",
+      "Os erros são tratados individualmente ou na frente da equipe?",
+      "A liderança escuta os colaboradores antes de tomar decisões?",
+      "Existe favoritismo entre membros da equipe?",
+      "Os colaboradores sentem medo da liderança?",
+      "Você já deixou de expressar sua opinião por receio da reação do gestor?"
+    ],
+    evidencias: [
+      "Comunicação agressiva",
+      "Gritos ou humilhações",
+      "Exposição pública de colaboradores",
+      "Ameaças ou intimidação",
+      "Abuso de autoridade",
+      "Favoritismo",
+      "Medo da liderança",
+      "Falta de diálogo",
+      "Ausência de feedback construtivo"
+    ],
+    notaTecnica: "A liderança exerce influência direta sobre o clima organizacional, a motivação, o desempenho e o bem-estar das equipes. Líderes preparados fortalecem a confiança, estimulam o desenvolvimento das pessoas e favorecem ambientes saudáveis.",
+  },
+  // ── 2. Atividades ──
+  {
+    id: "sobrecarga", estruturaId: "atividades", numero: "2.1",
+    nome: "Sobrecarga de Trabalho",
+    objetivo: "Avaliar se as demandas de trabalho impostas aos trabalhadores são compatíveis com os recursos disponíveis, considerando volume de tarefas, jornada, ritmo, prazos, acúmulo de funções e condições organizacionais para sua realização.",
+    perguntas: [
+      "Você considera que o volume de trabalho que recebe é adequado para ser realizado dentro da sua jornada?",
+      "Com que frequência você precisa fazer horas extras, levar trabalho para casa ou trabalhar nos finais de semana para dar conta das atividades?",
+      "Na sua percepção, a quantidade de pessoas na sua equipe é suficiente para as demandas existentes?",
+      "Você tem pausas regulares durante o expediente? Consegue respeitar seus horários de intervalo?",
+      "Na sua opinião, como o volume e o ritmo de trabalho afetam seu bem-estar e sua saúde?"
+    ],
+    aprofundamento: [
+      "A sobrecarga ocorre com qual frequência?",
+      "Houve redução recente na equipe sem redistribuição de tarefas?",
+      "As demandas são previsíveis ou mudam constantemente?",
+      "Existe acúmulo de funções?",
+      "A jornada ultrapassa o previsto em contrato?",
+      "Existem pausas regulares?",
+      "Como a sobrecarga impacta sua saúde e motivação?"
+    ],
+    evidencias: [
+      "Horas extras frequentes",
+      "Acúmulo de funções",
+      "Equipe reduzida",
+      "Ritmo intenso sem pausas",
+      "Prazos incompatíveis",
+      "Jornadas prolongadas",
+      "Fadiga crônica relatada",
+      "Queixas de sobrecarga recorrentes"
+    ],
+    notaTecnica: "A sobrecarga de trabalho é um dos fatores de risco psicossocial mais recorrentes. Não se resume apenas ao volume de tarefas, mas inclui a intensidade do ritmo, a pressão dos prazos, a insuficiência de recursos humanos, o acúmulo de funções e a ausência de pausas adequadas.",
+  },
+  {
+    id: "monotonia", estruturaId: "atividades", numero: "2.2",
+    nome: "Monotonia ou Baixa Variedade das Atividades",
+    objetivo: "Avaliar se as atividades desempenhadas pelos trabalhadores apresentam grau adequado de diversidade, estímulo intelectual e utilização das competências profissionais ou se são excessivamente repetitivas, previsíveis e pouco desafiadoras.",
+    perguntas: [
+      "Como você descreveria suas atividades diárias? Elas são diversificadas ou muito repetitivas?",
+      "Você considera que seu trabalho oferece oportunidades para aprender coisas novas, desenvolver habilidades ou enfrentar novos desafios?",
+      "Em algum momento você sente que a rotina de trabalho se torna cansativa, desmotivadora ou automática devido à repetição constante das atividades?",
+      "Você acredita que consegue utilizar seus conhecimentos, experiência e competências no desempenho das suas atividades ou sente que seu potencial é pouco aproveitado?",
+      "Caso pudesse modificar algum aspecto da sua rotina de trabalho, o que mudaria para torná-la mais estimulante ou satisfatória?"
+    ],
+    aprofundamento: [
+      "Há rodízio de atividades?",
+      "Você aprende novas competências com frequência?",
+      "Existe oportunidade de participar de projetos diferentes?",
+      "O trabalho exige tomada de decisão ou apenas execução?",
+      "Você sente que sua criatividade é utilizada?",
+      "Há possibilidade de crescimento profissional?",
+      "Como essa rotina influencia sua motivação?"
+    ],
+    evidencias: [
+      "Atividades excessivamente repetitivas",
+      "Baixo estímulo intelectual",
+      "Falta de desafios",
+      "Desmotivação",
+      "Sensação de estagnação",
+      "Baixo aproveitamento das competências",
+      "Baixo engajamento",
+      "Relatos frequentes de tédio"
+    ],
+    notaTecnica: "A monotonia não está relacionada apenas à repetição de movimentos físicos. Ela também pode ocorrer quando o trabalho oferece baixo estímulo cognitivo, pouca utilização das competências profissionais, ausência de desafios ou escassas oportunidades de aprendizagem.",
+  },
+  {
+    id: "trabalho_repetitivo", estruturaId: "atividades", numero: "2.3",
+    nome: "Trabalho Repetitivo",
+    objetivo: "Avaliar se as atividades desempenhadas pelos trabalhadores exigem a repetição contínua de movimentos, tarefas ou ciclos operacionais durante longos períodos, com pouca variação na execução do trabalho.",
+    perguntas: [
+      "Na sua rotina de trabalho, você realiza as mesmas atividades ou movimentos repetidamente durante grande parte da jornada?",
+      "A empresa oferece pausas, rodízio de atividades ou outras medidas para reduzir os efeitos da repetição das tarefas?",
+      "Após períodos prolongados executando as mesmas atividades, você percebe cansaço físico, fadiga mental, perda de concentração ou redução da produtividade?",
+      "Você considera que a repetição das atividades interfere na sua motivação, atenção ou bem-estar durante o trabalho?",
+      "Na sua opinião, o que poderia ser feito para tornar sua rotina de trabalho mais equilibrada e menos repetitiva?"
+    ],
+    aprofundamento: [
+      "Quanto tempo contínuo você executa as mesmas atividades?",
+      "Existem pausas programadas?",
+      "Há rodízio de tarefas?",
+      "Você sente dores ou desconforto durante a execução?",
+      "A repetição impacta sua atenção e concentração?",
+      "A empresa já adotou medidas para reduzir a repetitividade?"
+    ],
+    evidencias: [
+      "Ciclos de trabalho curtos e repetitivos",
+      "Ausência de pausas",
+      "Falta de rodízio de atividades",
+      "Queixas de fadiga física",
+      "Redução da atenção",
+      "Desmotivação relacionada à rotina",
+      "Desconforto musculoesquelético",
+      "Alta incidência de retrabalho"
+    ],
+    notaTecnica: "O trabalho repetitivo é caracterizado pela execução contínua dos mesmos movimentos, tarefas ou ciclos operacionais durante longos períodos, com pouca variação na forma de execução.",
+  },
+  {
+    id: "pressao_metas", estruturaId: "atividades", numero: "2.4",
+    nome: "Pressão por Metas",
+    objetivo: "Avaliar se as metas, indicadores de desempenho e formas de cobrança adotados pela organização são compatíveis com os recursos disponíveis e com a preservação da saúde mental dos trabalhadores.",
+    perguntas: [
+      "As metas definidas pela empresa para o seu trabalho são claras, realistas e alcançáveis com os recursos disponíveis?",
+      "De que forma a liderança acompanha o atingimento das metas? Existe apoio, orientação e feedback ou predominam cobranças, pressão e punições?",
+      "Quando um colaborador não atinge a meta estabelecida, como a empresa costuma reagir?",
+      "Na sua percepção, as metas estimulam o desenvolvimento profissional ou geram desgaste, medo e sobrecarga?",
+      "Você sente que a empresa prioriza resultados sem considerar o impacto sobre a saúde e o bem-estar dos colaboradores?"
+    ],
+    aprofundamento: [
+      "As metas mudam frequentemente?",
+      "Existe transparência nos critérios de avaliação?",
+      "A cobrança é feita de forma respeitosa?",
+      "Há exposição pública em caso de não atingimento?",
+      "As metas consideram fatores fora do controle do colaborador?",
+      "Existe recompensa compatível com o esforço?",
+      "Como a pressão impacta seu bem-estar?"
+    ],
+    evidencias: [
+      "Metas incompatíveis com recursos",
+      "Cobranças excessivas",
+      "Exposição pública de resultados",
+      "Ameaças por não atingimento",
+      "Competição prejudicial",
+      "Jornadas excessivas para cumprir metas",
+      "Falta de apoio da liderança",
+      "Metas que mudam constantemente"
+    ],
+    notaTecnica: "A existência de metas não representa, por si só, um risco psicossocial. Metas claras, alcançáveis e acompanhadas por lideranças preparadas podem, inclusive, favorecer o engajamento e o desenvolvimento profissional. O risco surge quando as metas são utilizadas como instrumento de pressão excessiva, medo ou constrangimento.",
+  },
+  // ── 3. Organizacional ──
+  {
+    id: "reconhecimento", estruturaId: "organizacional", numero: "3.1",
+    nome: "Baixo Reconhecimento",
+    objetivo: "Avaliar a percepção dos trabalhadores quanto ao reconhecimento recebido pela qualidade do trabalho realizado, pelo esforço empregado, pelos resultados alcançados e pelas contribuições oferecidas à organização.",
+    perguntas: [
+      "Você sente que seu trabalho é reconhecido e valorizado pela liderança e pela organização?",
+      "Quando você realiza um bom trabalho ou alcança resultados importantes, de que forma esse esforço costuma ser reconhecido?",
+      "Na sua percepção, os colaboradores recebem reconhecimento de forma justa, independentemente do cargo ou da área em que trabalham?",
+      "Você acredita que seu trabalho contribui para os resultados da empresa e que essa contribuição é percebida pela organização?",
+      "O que poderia ser feito pela empresa para que os colaboradores se sentissem mais valorizados e reconhecidos?"
+    ],
+    aprofundamento: [
+      "O reconhecimento ocorre apenas quando existem erros?",
+      "A liderança costuma elogiar bons resultados?",
+      "Existe feedback positivo?",
+      "Há oportunidades de crescimento?",
+      "Você sente que seu esforço faz diferença?",
+      "Os colaboradores são valorizados de maneira igual?",
+      "Como a falta de reconhecimento influencia sua motivação?"
+    ],
+    evidencias: [
+      "Falta de feedback positivo",
+      "Reconhecimento insuficiente",
+      "Desmotivação",
+      "Sentimento de desvalorização",
+      "Baixo engajamento",
+      "Reclamações recorrentes",
+      "Alta rotatividade"
+    ],
+    notaTecnica: "O reconhecimento organizacional não se limita a recompensas financeiras ou promoções. Ele envolve feedback construtivo, valorização do esforço, respeito pelas contribuições individuais, oportunidades de desenvolvimento e demonstrações genuínas de apreço pelo trabalho realizado.",
+  },
+  {
+    id: "inseguranca_emprego", estruturaId: "organizacional", numero: "3.2",
+    nome: "Insegurança no Emprego",
+    objetivo: "Avaliar a percepção dos trabalhadores quanto à estabilidade e à segurança em relação ao seu emprego, considerando ameaças de demissão, reestruturações organizacionais, terceirização, precarização e mudanças que possam comprometer a continuidade do vínculo profissional.",
+    perguntas: [
+      "Você sente que seu emprego está seguro ou existe alguma preocupação com a possibilidade de perda do trabalho?",
+      "Nos últimos meses, houve demissões, reestruturações ou mudanças que tenham gerado preocupação entre os colaboradores?",
+      "A empresa comunica com clareza sobre sua situação financeira, planos de crescimento ou eventuais mudanças que possam afetar os trabalhadores?",
+      "Você sente que a empresa valoriza os colaboradores e busca manter as pessoas ou percebe instabilidade no tratamento dado aos trabalhadores?",
+      "Como a incerteza sobre o futuro do emprego afeta seu bem-estar, motivação e desempenho?"
+    ],
+    aprofundamento: [
+      "Houve demissões recentes?",
+      "Existem rumores sobre reestruturações?",
+      "A empresa comunica mudanças com antecedência?",
+      "Há terceirização de funções?",
+      "Os contratos são estáveis?",
+      "Existem ameaças veladas ou explícitas?",
+      "Como a insegurança afeta seu dia a dia?"
+    ],
+    evidencias: [
+      "Demissões frequentes",
+      "Reestruturações sem comunicação",
+      "Terceirização de funções",
+      "Contratos precários",
+      "Ameaças de demissão",
+      "Rumores sobre cortes",
+      "Falta de perspectiva de carreira",
+      "Alta rotatividade"
+    ],
+    notaTecnica: "A insegurança no emprego gera impactos significativos na saúde mental dos trabalhadores, afetando sua capacidade de concentração, motivação, engajamento e disposição para colaborar com a organização.",
+  },
+  {
+    id: "gestao_mudancas", estruturaId: "organizacional", numero: "3.3",
+    nome: "Má Gestão de Mudanças",
+    objetivo: "Avaliar como a organização planeja, comunica, implementa e acompanha mudanças organizacionais relevantes, considerando seu impacto sobre os trabalhadores, a comunicação durante o processo e o suporte oferecido para adaptação.",
+    perguntas: [
+      "Quando a empresa realiza mudanças importantes, como reestruturações, mudanças de processos, implementação de novos sistemas ou alterações na equipe, essas mudanças são comunicadas previamente aos colaboradores?",
+      "Na sua percepção, os trabalhadores são ouvidos ou envolvidos durante os processos de mudança ou as decisões são impostas sem consulta?",
+      "A empresa oferece treinamento, orientação e suporte quando implementa novas formas de trabalho, sistemas ou processos?",
+      "As mudanças realizadas pela empresa costumam aumentar ou diminuir o estresse e a pressão no ambiente de trabalho?",
+      "De maneira geral, como você avalia a forma como a empresa conduz as mudanças organizacionais?"
+    ],
+    aprofundamento: [
+      "As mudanças são comunicadas com antecedência?",
+      "Os colaboradores são consultados antes das decisões?",
+      "Existe treinamento para adaptação?",
+      "As mudanças aumentam a sobrecarga?",
+      "Os impactos das mudanças são monitorados?",
+      "A liderança oferece suporte durante o processo?"
+    ],
+    evidencias: [
+      "Mudanças sem comunicação prévia",
+      "Ausência de participação dos trabalhadores",
+      "Falta de treinamento",
+      "Aumento de sobrecarga pós-mudança",
+      "Resistência dos colaboradores",
+      "Retrabalho frequente",
+      "Queixas sobre implantação de sistemas",
+      "Falta de suporte da liderança"
+    ],
+    notaTecnica: "As mudanças organizacionais fazem parte da evolução das empresas e, por si só, não representam um risco psicossocial. O fator de risco está relacionado à forma como essas mudanças são conduzidas.",
+  },
+  {
+    id: "justica_organizacional", estruturaId: "organizacional", numero: "3.4",
+    nome: "Baixa Justiça Organizacional",
+    objetivo: "Avaliar a percepção dos trabalhadores quanto à justiça, imparcialidade e transparência das decisões adotadas pela organização, especialmente em relação à distribuição de oportunidades, reconhecimento, promoções, aplicação de normas, resolução de conflitos e tratamento entre os colaboradores.",
+    perguntas: [
+      "Na sua percepção, os colaboradores são tratados de forma justa, respeitosa e imparcial pela empresa e pelas lideranças?",
+      "Você considera que promoções, oportunidades de desenvolvimento, reconhecimentos e decisões importantes seguem critérios claros e transparentes?",
+      "Quando ocorrem conflitos, reclamações ou situações de desentendimento, a empresa costuma analisar os fatos com imparcialidade e buscar soluções justas?",
+      "Você acredita que as regras e normas da empresa são aplicadas da mesma forma para todos os colaboradores, independentemente do cargo ou da função?",
+      "De maneira geral, você confia que as decisões tomadas pela empresa são éticas, transparentes e coerentes?"
+    ],
+    aprofundamento: [
+      "Existem pessoas que recebem tratamento diferenciado?",
+      "Os critérios para promoções são conhecidos?",
+      "As regras são aplicadas igualmente para todos?",
+      "Você já presenciou situações de favorecimento?",
+      "Os trabalhadores conseguem recorrer quando discordam de alguma decisão?",
+      "A empresa costuma ouvir todas as partes antes de decidir?",
+      "Como essas situações influenciam sua motivação?"
+    ],
+    evidencias: [
+      "Percepção de favorecimento",
+      "Critérios pouco transparentes",
+      "Aplicação desigual das regras",
+      "Falta de imparcialidade",
+      "Baixa confiança nas decisões",
+      "Reclamações recorrentes",
+      "Desmotivação relacionada à gestão"
+    ],
+    notaTecnica: "A justiça organizacional representa a síntese da confiança existente entre trabalhadores e organização. Empresas percebidas como justas fortalecem o comprometimento, reduzem conflitos, aumentam o engajamento e criam ambientes psicologicamente seguros.",
+  },
+];
+
+const ENTREVISTA_MATURIDADE = [
+  {
+    nivel: 1, label: "Organização Preventiva", cor: "#22c55e",
+    descricao: "A organização demonstra elevado comprometimento com a saúde mental dos trabalhadores. Atua preventivamente, identifica riscos antes que produzam impactos significativos e promove um ambiente de trabalho saudável.",
+    caracteristicas: ["Lideranças preparadas", "Comunicação transparente", "Ambiente de respeito", "Segurança psicológica", "Gestão estruturada dos riscos", "Cultura de aprendizagem", "Participação dos trabalhadores", "Monitoramento contínuo"],
+  },
+  {
+    nivel: 2, label: "Organização em Desenvolvimento", cor: "#F0A800",
+    descricao: "Existem boas práticas implantadas, porém ainda são observadas oportunidades de melhoria. A empresa demonstra intenção de evoluir, porém necessita fortalecer sua cultura preventiva.",
+    caracteristicas: ["Alguns fatores de risco moderados", "Lideranças em processo de desenvolvimento", "Comunicação parcialmente estruturada", "Programas preventivos ainda em consolidação"],
+  },
+  {
+    nivel: 3, label: "Organização Vulnerável", cor: "#F66B0A",
+    descricao: "Diversos fatores de risco apresentam intensidade moderada ou alta. A organização apresenta risco significativo de adoecimento ocupacional caso medidas preventivas não sejam implementadas.",
+    caracteristicas: ["Sobrecarga frequente", "Comunicação deficiente", "Baixa participação dos trabalhadores", "Lideranças inconsistentes", "Clima organizacional fragilizado"],
+  },
+  {
+    nivel: 4, label: "Organização em Situação Crítica", cor: "#E5484D",
+    descricao: "Foram identificadas evidências consistentes de elevado risco psicossocial. A empresa necessita de intervenção prioritária e implementação imediata de ações estruturantes.",
+    caracteristicas: ["Assédio recorrente", "Violência organizacional", "Metas abusivas", "Medo", "Alta rotatividade", "Elevado absenteísmo", "Afastamentos relacionados à saúde mental", "Baixa confiança na liderança"],
+  },
+];
+
+const CLASSIFICACAO_LABELS = {
+  1: "Muito Baixo", 2: "Baixo", 3: "Moderado", 4: "Alto", 5: "Muito Alto"
+};
+const CLASSIFICACAO_CORES = {
+  1: "#22c55e", 2: "#4ade80", 3: "#F0A800", 4: "#F66B0A", 5: "#E5484D"
+};
+
+// Mock: entrevistas em andamento por cliente
+const ENTREVISTAS_MOCK = [
+  {
+    id: "ent-1", clienteId: "loghaus", titulo: "Entrevista Diagnóstica — Q3/2026",
+    entrevistador: "Caio Guedes", data: "2026-07-15", status: "em_andamento",
+    fatoresAvaliados: {
+      assedio: { classificacao: 2, observacoes: "Não foram identificados relatos significativos." },
+      relacoes_interpessoais: { classificacao: 3, observacoes: "Existem conflitos pontuais entre equipes operacionais." },
+      apoio_social: { classificacao: 2, observacoes: "Liderança acessível, bom nível de cooperação." },
+      lideranca_abusiva: { classificacao: 1, observacoes: "Sem evidências de liderança abusiva." },
+      sobrecarga: { classificacao: 4, observacoes: "Equipe reduzida em operações. Horas extras frequentes." },
+      monotonia: { classificacao: 3, observacoes: "Atividades operacionais com baixa variação." },
+    },
+  },
+  {
+    id: "ent-2", clienteId: "vitamed", titulo: "Avaliação Psicossocial — Unidades Hospitalares",
+    entrevistador: "Caio Guedes", data: "2026-03-20", status: "concluida",
+    fatoresAvaliados: {
+      assedio: { classificacao: 1, observacoes: "Ambiente de respeito." },
+      relacoes_interpessoais: { classificacao: 2, observacoes: "Boa integração entre equipes." },
+      apoio_social: { classificacao: 1, observacoes: "Forte cultura de apoio." },
+      lideranca_abusiva: { classificacao: 1, observacoes: "Lideranças preparadas e respeitosas." },
+      sobrecarga: { classificacao: 3, observacoes: "Plantões podem gerar fadiga em alguns setores." },
+      monotonia: { classificacao: 2, observacoes: "Atividades variadas na maioria dos setores." },
+      trabalho_repetitivo: { classificacao: 2, observacoes: "Procedimentos padronizados mas com variação de casos." },
+      pressao_metas: { classificacao: 2, observacoes: "Metas claras e atingíveis." },
+      reconhecimento: { classificacao: 2, observacoes: "Feedback positivo regular." },
+      inseguranca_emprego: { classificacao: 1, observacoes: "Empresa em expansão, estabilidade percebida." },
+      gestao_mudancas: { classificacao: 2, observacoes: "Mudanças comunicadas, porém treinamento pode ser aprimorado." },
+      justica_organizacional: { classificacao: 1, observacoes: "Critérios transparentes e aplicados de forma equitativa." },
+    },
+  },
+  {
+    id: "ent-3", clienteId: "agrocorp", titulo: "Diagnóstico Psicossocial — Operações SP",
+    entrevistador: "Caio Guedes", data: "2026-05-10", status: "rascunho",
+    fatoresAvaliados: {},
+  },
+];
+
+// ════════════════════════════════════════════════════════════
+// FRENTE 2 — MATRIZ DE RISCO E SEVERIDADE
+// ════════════════════════════════════════════════════════════
+
+// Classificação da matriz 5×5 (P×S) — conforme documento visual
+const MATRIZ_CLASSIFICACOES = {
+  "P1-S1": "insignificante", "P1-S2": "baixo",      "P1-S3": "baixo",      "P1-S4": "moderado",   "P1-S5": "moderado",
+  "P2-S1": "baixo",          "P2-S2": "baixo",      "P2-S3": "moderado",   "P2-S4": "moderado",   "P2-S5": "alto",
+  "P3-S1": "baixo",          "P3-S2": "moderado",   "P3-S3": "moderado",   "P3-S4": "alto",       "P3-S5": "alto",
+  "P4-S1": "moderado",       "P4-S2": "moderado",   "P4-S3": "alto",       "P4-S4": "alto",       "P4-S5": "critico",
+  "P5-S1": "moderado",       "P5-S2": "alto",       "P5-S3": "alto",       "P5-S4": "critico",    "P5-S5": "critico",
+};
+
+const MATRIZ_NIVEIS = {
+  insignificante: { label: "Insignificante", cor: "#38bdf8", prioridade: "Monitoramento" },
+  baixo:          { label: "Baixo",          cor: "#4ade80", prioridade: "Longo prazo" },
+  moderado:       { label: "Moderado",       cor: "#facc15", prioridade: "Médio prazo" },
+  alto:           { label: "Alto",           cor: "#fb923c", prioridade: "Curto prazo" },
+  critico:        { label: "Crítico",        cor: "#f87171", prioridade: "Imediata" },
+};
+
+// Frameworks de Severidade por Fator
+const SEVERIDADE_FRAMEWORKS = {
+  copsoq: {
+    label: "Framework COPSOQ-inspired — Padrão (autoral)",
+    fatores: [
+      { codigo: "CLAREZA_PAPEL",    nome: "Baixa clareza de papel/função",             severidade: 4, justificativa: "" },
+      { codigo: "CONTROLE",         nome: "Baixo controle no trabalho / Falta de autonomia", severidade: 4, justificativa: "" },
+      { codigo: "JUSTICA",          nome: "Baixa justiça organizacional",              severidade: 4, justificativa: "" },
+      { codigo: "MUDANCA_ORG",      nome: "Má gestão de mudanças organizacionais",     severidade: 4, justificativa: "" },
+      { codigo: "RECOMPENSAS",      nome: "Baixas recompensas e reconhecimento",       severidade: 3, justificativa: "" },
+      { codigo: "RELACIONAMENTOS",  nome: "Maus relacionamentos no local de trabalho", severidade: 4, justificativa: "" },
+      { codigo: "SOBRECARGA",       nome: "Excesso de demandas no trabalho (sobrecarga)", severidade: 4, justificativa: "" },
+      { codigo: "SUPORTE",          nome: "Falta de suporte/apoio no trabalho",        severidade: 4, justificativa: "" },
+      { codigo: "WORK_CONTENT",     nome: "Conteúdo do Trabalho",                     severidade: 4, justificativa: "" },
+      { codigo: "WORK_LIFE",        nome: "Interface Trabalho-Vida",                   severidade: 4, justificativa: "" },
+    ]
+  },
+  hse: {
+    label: "Framework HSE-inspired — Padrão (autoral)",
+    fatores: [
+      { codigo: "CLAREZA_PAPEL",    nome: "Baixa clareza de papel/função",             severidade: 4, justificativa: "" },
+      { codigo: "CONTROLE",         nome: "Baixo controle no trabalho / Falta de autonomia", severidade: 4, justificativa: "" },
+      { codigo: "MUDANCA_ORG",      nome: "Má gestão de mudanças organizacionais",     severidade: 4, justificativa: "" },
+      { codigo: "RELACIONAMENTOS",  nome: "Maus relacionamentos no local de trabalho", severidade: 4, justificativa: "" },
+      { codigo: "SOBRECARGA",       nome: "Excesso de demandas no trabalho (sobrecarga)", severidade: 4, justificativa: "" },
+      { codigo: "SUPORTE",          nome: "Falta de suporte/apoio no trabalho",        severidade: 4, justificativa: "" },
+    ]
+  },
+  mte: {
+    label: "MTE Psicossociais — Padrão",
+    fatores: [
+      { codigo: "ASSEDIO",          nome: "Assédio de qualquer natureza no trabalho",  severidade: 5, justificativa: "Risco jurídico, dano psíquico grave" },
+      { codigo: "CLAREZA_PAPEL",    nome: "Baixa clareza de papel/função",             severidade: 4, justificativa: "" },
+      { codigo: "COMUNICACAO",      nome: "Trabalho em condições de difícil comunicação", severidade: 3, justificativa: "" },
+      { codigo: "CONTROLE",         nome: "Baixo controle no trabalho / Falta de autonomia", severidade: 4, justificativa: "" },
+      { codigo: "ISOLAMENTO",       nome: "Trabalho remoto e isolado",                 severidade: 3, justificativa: "" },
+      { codigo: "JUSTICA",          nome: "Baixa justiça organizacional",              severidade: 4, justificativa: "" },
+      { codigo: "MUDANCA_ORG",      nome: "Má gestão de mudanças organizacionais",     severidade: 4, justificativa: "" },
+      { codigo: "RECOMPENSAS",      nome: "Baixas recompensas e reconhecimento",       severidade: 3, justificativa: "" },
+      { codigo: "RELACIONAMENTOS",  nome: "Maus relacionamentos no local de trabalho", severidade: 4, justificativa: "" },
+      { codigo: "SOBRECARGA",       nome: "Excesso de demandas no trabalho (sobrecarga)", severidade: 4, justificativa: "Burnout, afastamento prolongado" },
+      { codigo: "SUBCARGA",         nome: "Baixa demanda no trabalho (subcarga)",      severidade: 3, justificativa: "" },
+      { codigo: "SUPORTE",          nome: "Falta de suporte/apoio no trabalho",        severidade: 4, justificativa: "" },
+      { codigo: "VIOLENCIA_TRAUMA", nome: "Eventos violentos ou traumáticos",          severidade: 5, justificativa: "" },
+    ]
+  },
+};
+
+// Mock: versões de matrizes por cliente
+const MATRIZES_VERSOES = {
+  loghaus: [
+    { versao: "v1.0", status: "publicada", criadaEm: "23/06/2026", publicadaEm: "23/06/2026", campanhas: 0, framework: "copsoq" },
+    { versao: "v2.0", status: "rascunho", criadaEm: "13/07/2026", publicadaEm: null, campanhas: 0, framework: "copsoq" },
+  ],
+  vitamed: [
+    { versao: "v1.0", status: "publicada", criadaEm: "15/01/2026", publicadaEm: "15/01/2026", campanhas: 1, framework: "mte" },
+  ],
+  agrocorp: [
+    { versao: "v1.0", status: "rascunho", criadaEm: "10/08/2026", publicadaEm: null, campanhas: 0, framework: "copsoq" },
+  ],
+};
+
+// Função para calcular o resultado da matriz P×S
+const calcularResultadoMatriz = (probabilidade, severidade) => {
+  const p = Math.max(1, Math.min(5, Math.round(probabilidade)));
+  const s = Math.max(1, Math.min(5, Math.round(severidade)));
+  const chave = `P${p}-S${s}`;
+  return MATRIZ_CLASSIFICACOES[chave] || "moderado";
+};
+
+// ════════════════════════════════════════════════════════════
+// FRENTE 3 — CANAL DE DENÚNCIAS
+// ════════════════════════════════════════════════════════════
+
+const TIPOS_DENUNCIA = [
+  { id: "assedio_moral",  nome: "Assédio Moral",     icone: "shield",   cor: "#E5484D" },
+  { id: "assedio_sexual", nome: "Assédio Sexual",    icone: "shield",   cor: "#DC2626" },
+  { id: "fraude",         nome: "Fraude",            icone: "file",     cor: "#F0A800" },
+  { id: "corrupcao",     nome: "Corrupção",         icone: "lock",     cor: "#F66B0A" },
+  { id: "discriminacao", nome: "Discriminação",     icone: "users",    cor: "#7C3AED" },
+  { id: "conflito",      nome: "Conflito de Interesses", icone: "flag", cor: "#2A6FDB" },
+  { id: "seguranca",     nome: "Riscos à Segurança", icone: "shield",  cor: "#0D9488" },
+  { id: "sugestao",      nome: "Sugestão de Melhoria", icone: "spark", cor: "#22c55e" },
+  { id: "outros",        nome: "Outros",             icone: "more",    cor: "#5C667C" },
+];
+
+const DENUNCIA_STATUS = {
+  triagem:       { label: "Em Triagem",      cor: "#2A6FDB", icone: "search" },
+  investigacao:  { label: "Em Investigação", cor: "#F0A800", icone: "eye" },
+  concluido:     { label: "Concluído",       cor: "#22c55e", icone: "check" },
+  arquivado:     { label: "Arquivado",       cor: "#5C667C", icone: "file" },
+};
+
+const DENUNCIA_GRAVIDADE = {
+  baixa:  { label: "Baixa",  cor: "#4ade80" },
+  media:  { label: "Média",  cor: "#F0A800" },
+  alta:   { label: "Alta",   cor: "#E5484D" },
+};
+
+// Mock: denúncias registradas
+const DENUNCIAS_MOCK = [
+  {
+    id: "den-001", protocolo: "DEN-2026-0001",
+    clienteId: "loghaus", data: "2026-06-15T09:23:00",
+    status: "investigacao", gravidade: "alta",
+    tipoId: "assedio_moral", natureza: "Assédio Moral",
+    anonimo: true, denunciante: null,
+    area: "Operações — Separação de Pedidos",
+    relato: "Há relatos recorrentes de que o supervisor do turno noturno utiliza tom agressivo, faz cobranças desrespeitosas em público e ameaça colaboradores com transferência ou demissão quando não atingem as metas diárias. Três colaboradores diferentes já relataram situações semelhantes nos últimos 2 meses.",
+    evidencias: ["Registro de reclamação ao RH em 02/06/2026", "Ata de reunião CIPA mencionando queixas"],
+    admissibilidade: "Elementos mínimos de autoria e materialidade identificados. Múltiplos relatos convergentes.",
+    prazoFinal: "2026-07-15",
+    parecer: null,
+    resultado: null,
+    recomendacoes: null,
+    andamentos: [
+      { data: "2026-06-15T09:23:00", etapa: "Recebimento", descricao: "Denúncia registrada via portal anônimo.", responsavel: "Sistema" },
+      { data: "2026-06-16T14:00:00", etapa: "Triagem", descricao: "Caso classificado como gravidade alta. Encaminhado para investigação.", responsavel: "Ana Paula (Compliance)" },
+      { data: "2026-06-20T10:30:00", etapa: "Investigação", descricao: "Iniciada coleta de depoimentos com colaboradores da área.", responsavel: "Ana Paula (Compliance)" },
+    ],
+    mensagens: [
+      { data: "2026-06-18T11:00:00", remetente: "compliance", texto: "Agradecemos seu relato. Estamos apurando os fatos com total sigilo. Você poderia informar aproximadamente há quanto tempo essas situações ocorrem?" },
+      { data: "2026-06-19T08:45:00", remetente: "denunciante", texto: "Acontece há cerca de 3 meses, desde que o novo supervisor assumiu o turno." },
+    ],
+    auditLog: [
+      { data: "2026-06-15T09:23:00", acao: "Denúncia criada", usuario: "Sistema" },
+      { data: "2026-06-16T14:00:00", acao: "Status alterado para Em Investigação", usuario: "Ana Paula" },
+      { data: "2026-06-18T11:00:00", acao: "Mensagem enviada ao denunciante", usuario: "Ana Paula" },
+      { data: "2026-06-20T10:30:00", acao: "Andamento registrado", usuario: "Ana Paula" },
+    ],
+  },
+  {
+    id: "den-002", protocolo: "DEN-2026-0002",
+    clienteId: "loghaus", data: "2026-07-01T14:10:00",
+    status: "triagem", gravidade: "media",
+    tipoId: "sugestao", natureza: "Sugestão de Melhoria",
+    anonimo: false, denunciante: "Roberto Silva",
+    area: "Administrativo",
+    relato: "Sugiro que a empresa implemente um programa de rodízio de atividades para os setores operacionais. Vários colegas já manifestaram cansaço e desmotivação pela repetição constante das mesmas tarefas. Acredito que isso melhoraria o bem-estar e a produtividade.",
+    evidencias: [],
+    admissibilidade: null,
+    prazoFinal: "2026-08-01",
+    parecer: null, resultado: null, recomendacoes: null,
+    andamentos: [
+      { data: "2026-07-01T14:10:00", etapa: "Recebimento", descricao: "Sugestão registrada via portal.", responsavel: "Sistema" },
+    ],
+    mensagens: [],
+    auditLog: [
+      { data: "2026-07-01T14:10:00", acao: "Sugestão criada", usuario: "Sistema" },
+    ],
+  },
+  {
+    id: "den-003", protocolo: "DEN-2026-0003",
+    clienteId: "vitamed", data: "2026-05-20T16:45:00",
+    status: "concluido", gravidade: "media",
+    tipoId: "conflito", natureza: "Conflito de Interesses",
+    anonimo: true, denunciante: null,
+    area: "Compras",
+    relato: "Identificada situação em que o responsável pelo setor de compras possui vínculo familiar com fornecedor habitual da empresa. As cotações parecem sempre favorecer esse fornecedor mesmo quando há opções mais econômicas disponíveis.",
+    evidencias: ["Planilha comparativa de cotações dos últimos 6 meses"],
+    admissibilidade: "Elementos suficientes para investigação. Documentação comprobatória anexada.",
+    prazoFinal: "2026-06-20",
+    parecer: "Após investigação, confirmou-se que o colaborador possuía parentesco com sócio do fornecedor, configurando conflito de interesses. Foram identificados 4 processos de compra com sobrepreço estimado de 15%.",
+    resultado: "procedente",
+    recomendacoes: "1. Substituição do responsável nas cotações envolvendo o fornecedor. 2. Revisão da política de conflito de interesses. 3. Treinamento de ética para o setor.",
+    andamentos: [
+      { data: "2026-05-20T16:45:00", etapa: "Recebimento", descricao: "Denúncia registrada.", responsavel: "Sistema" },
+      { data: "2026-05-21T09:00:00", etapa: "Triagem", descricao: "Classificação de gravidade média.", responsavel: "Ana Paula (Compliance)" },
+      { data: "2026-05-25T10:00:00", etapa: "Investigação", descricao: "Análise das cotações e contratos.", responsavel: "Ana Paula (Compliance)" },
+      { data: "2026-06-10T14:00:00", etapa: "Conclusão", descricao: "Parecer emitido. Denúncia procedente.", responsavel: "Ana Paula (Compliance)" },
+    ],
+    mensagens: [],
+    auditLog: [
+      { data: "2026-05-20T16:45:00", acao: "Denúncia criada", usuario: "Sistema" },
+      { data: "2026-05-21T09:00:00", acao: "Status: Em Triagem → Em Investigação", usuario: "Ana Paula" },
+      { data: "2026-06-10T14:00:00", acao: "Status: Em Investigação → Concluído", usuario: "Ana Paula" },
+    ],
+  },
+  {
+    id: "den-004", protocolo: "DEN-2026-0004",
+    clienteId: "loghaus", data: "2026-08-05T08:30:00",
+    status: "triagem", gravidade: "alta",
+    tipoId: "assedio_sexual", natureza: "Assédio Sexual",
+    anonimo: true, denunciante: null,
+    area: "Logística — Centro de Distribuição",
+    relato: "Colaboradora relata que vem recebendo mensagens inapropriadas de conteúdo sexual por parte de colega do mesmo setor, enviadas pelo aplicativo de mensagens pessoal. As mensagens são insistentes mesmo após pedido para parar. Situação causa desconforto e medo de represálias.",
+    evidencias: ["Capturas de tela das mensagens (anonimizadas)"],
+    admissibilidade: null,
+    prazoFinal: "2026-08-20",
+    parecer: null, resultado: null, recomendacoes: null,
+    andamentos: [
+      { data: "2026-08-05T08:30:00", etapa: "Recebimento", descricao: "Denúncia registrada via portal anônimo.", responsavel: "Sistema" },
+    ],
+    mensagens: [],
+    auditLog: [
+      { data: "2026-08-05T08:30:00", acao: "Denúncia criada", usuario: "Sistema" },
+    ],
+  },
+];
+
+// Governança mock
+const GOVERNANCA_COMITES = [
+  { id: "com-1", nome: "Comitê de Ética e Compliance", membros: ["Ana Paula Rios", "Mariana Aguiar", "Dr. Carlos Mendes"], clienteId: "loghaus" },
+  { id: "com-2", nome: "Comitê de Integridade", membros: ["Roberto Lima", "Dra. Patrícia Souza"], clienteId: "vitamed" },
+];
+
+const GOVERNANCA_POLITICAS = [
+  { id: "pol-1", titulo: "Política de Prevenção ao Assédio", versao: "2.0", dataPublicacao: "01/03/2026", clienteId: "loghaus" },
+  { id: "pol-2", titulo: "Código de Ética e Conduta", versao: "3.1", dataPublicacao: "15/01/2026", clienteId: "loghaus" },
+  { id: "pol-3", titulo: "Política de Conflito de Interesses", versao: "1.0", dataPublicacao: "20/02/2026", clienteId: "loghaus" },
+  { id: "pol-4", titulo: "Protocolo de Acolhimento", versao: "1.0", dataPublicacao: "10/03/2026", clienteId: "vitamed" },
+];
+
+// ════════════════════════════════════════════════════════════
+// EXPORTS — all globals
+// ════════════════════════════════════════════════════════════
+
 Object.assign(window, {
   CLIENTES, COPSOQ_DIMS, NR17_DIMS, DIAG_DIMS_MAP, DIAGNOSTICOS, AVALIACOES_ATIVAS, LEADS_PIPELINE, TRILHAS,
   ROADMAP_FASES, ROADMAP_ESTADO, CLIENTE_ETAPAS, ETAPAS_CLIENTE, ETAPAS_ESTADO_INICIAL,
   getDiagnosticoResultadoMock,
+  // Frente 1 — Entrevistas
+  ENTREVISTA_ESTRUTURAS, ENTREVISTA_FATORES, ENTREVISTA_MATURIDADE,
+  CLASSIFICACAO_LABELS, CLASSIFICACAO_CORES, ENTREVISTAS_MOCK,
+  // Frente 2 — Matriz de Risco
+  MATRIZ_CLASSIFICACOES, MATRIZ_NIVEIS, SEVERIDADE_FRAMEWORKS,
+  MATRIZES_VERSOES, calcularResultadoMatriz,
+  // Frente 3 — Canal de Denúncias
+  TIPOS_DENUNCIA, DENUNCIA_STATUS, DENUNCIA_GRAVIDADE,
+  DENUNCIAS_MOCK, GOVERNANCA_COMITES, GOVERNANCA_POLITICAS,
 });

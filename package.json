@@ -1,0 +1,14 @@
+{
+  "name": "menctor-sistema",
+  "version": "1.0.0",
+  "description": "Menctor Sistema — Plataforma de Gestão de Riscos Psicossociais, Matriz PGR e Canal de Denúncias",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve -l 3000 .",
+    "dev": "npx serve -l 3000 .",
+    "serve": "npx serve -l 3000 ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

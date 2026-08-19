@@ -130,12 +130,14 @@ const AppHeader = ({ userName = "Alex Sandro", userRole = "Consultor Lector", on
 // SIDEBAR
 // ════════════════════════════════════════════════════════════
 const NAV_ITEMS = [
-  { id: "home",         icon: "home",     label: "Visão geral",  group: "operacional" },
-  { id: "clientes",     icon: "users",    label: "Clientes",     group: "comercial"   },
-  { id: "campanhas",    icon: "megaphone",label: "Campanhas",    group: "comercial"   },
-  { id: "pipeline",     icon: "pipeline", label: "Pipeline",     group: "comercial"   },
-  { id: "aprendizado",  icon: "book",     label: "Aprendizado",  group: "conteudo"    },
-  { id: "diagnosticos", icon: "pulse",    label: "Diagnósticos", group: "conteudo"    },
+  { id: "home",         icon: "home",      label: "Visão geral",  group: "operacional" },
+  { id: "clientes",     icon: "users",     label: "Clientes",     group: "comercial"   },
+  { id: "campanhas",    icon: "megaphone", label: "Campanhas",    group: "comercial"   },
+  { id: "pipeline",     icon: "pipeline",  label: "Pipeline",     group: "comercial"   },
+  { id: "aprendizado",  icon: "book",      label: "Aprendizado",  group: "conteudo"    },
+  { id: "diagnosticos", icon: "pulse",     label: "Diagnósticos", group: "conteudo"    },
+  { id: "entrevistas",  icon: "clipboard", label: "Entrevistas",  group: "conteudo"    },
+  { id: "denuncias",    icon: "shield",    label: "Denúncias",    group: "conteudo"    },
 ];
 
 const NAV_GROUPS = [
