@@ -206,18 +206,26 @@ const ClientCard = ({ cliente: c, navigate }) => {
             <Icon name="map" size={13} /> Abrir etapas do projeto
           </button>
         )}
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+          <button
+            onClick={() => navigate("matriz-risco", { clienteId: c.id })}
+            className="btn btn-soft"
+            style={{ height: 34, justifyContent: "center", fontSize: 11.5, padding: "0 6px", background: "rgba(0,32,77,0.06)", color: "var(--navy)" }}
+            title="Matriz de Risco (PGR) — NR-01"
+          >
+            <Icon name="activity" size={12} color="var(--navy)" /> Matriz PGR
+          </button>
           <button
             onClick={() => navigate("plano-acao", { clienteId: c.id })}
             className="btn btn-soft"
-            style={{ flex: 1, height: 34, justifyContent: "center", fontSize: 12 }}
+            style={{ height: 34, justifyContent: "center", fontSize: 11.5, padding: "0 6px" }}
           >
-            <Icon name="clipboard" size={12} /> Plano de Ação
+            <Icon name="clipboard" size={12} /> Plano Ação
           </button>
           <button
             onClick={() => navigate("relatorios", { clienteId: c.id })}
             className="btn btn-soft"
-            style={{ flex: 1, height: 34, justifyContent: "center", fontSize: 12 }}
+            style={{ height: 34, justifyContent: "center", fontSize: 11.5, padding: "0 6px" }}
           >
             <Icon name="file" size={12} /> Relatórios
           </button>

@@ -997,49 +997,62 @@ const MATRIZ_NIVEIS = {
 };
 
 // Frameworks de Severidade por Fator
+const SEVERIDADE_NIVEIS = {
+  1: { valor: 1, label: "1 — Insignificante", nome: "Insignificante", cor: "#38bdf8", desc: "Impacto residual ou nulo na saúde psíquica" },
+  2: { valor: 2, label: "2 — Leve", nome: "Leve", cor: "#4ade80", desc: "Insatisfação pontual, desconforto transitório, turnover pontual" },
+  3: { valor: 3, label: "3 — Moderado", nome: "Moderado", cor: "#facc15", desc: "Estresse crônico, queda de engajamento, conflito trabalho-família" },
+  4: { valor: 4, label: "4 — Grave", nome: "Grave", cor: "#fb923c", desc: "Burnout, adoecimento, afastamentos prolongados (B91/B31)" },
+  5: { valor: 5, label: "5 — Catastrófico", nome: "Catastrófico", cor: "#f87171", desc: "Risco jurídico grave, assédio, ideação, trauma severo" },
+};
+
 const SEVERIDADE_FRAMEWORKS = {
   copsoq: {
     label: "Framework COPSOQ-inspired — Padrão (autoral)",
+    descricao: "10 dimensões fundamentais baseadas no modelo Copenhagen Psychosocial Questionnaire adaptado.",
     fatores: [
-      { codigo: "CLAREZA_PAPEL",    nome: "Baixa clareza de papel/função",             severidade: 4, justificativa: "" },
-      { codigo: "CONTROLE",         nome: "Baixo controle no trabalho / Falta de autonomia", severidade: 4, justificativa: "" },
-      { codigo: "JUSTICA",          nome: "Baixa justiça organizacional",              severidade: 4, justificativa: "" },
-      { codigo: "MUDANCA_ORG",      nome: "Má gestão de mudanças organizacionais",     severidade: 4, justificativa: "" },
-      { codigo: "RECOMPENSAS",      nome: "Baixas recompensas e reconhecimento",       severidade: 3, justificativa: "" },
-      { codigo: "RELACIONAMENTOS",  nome: "Maus relacionamentos no local de trabalho", severidade: 4, justificativa: "" },
-      { codigo: "SOBRECARGA",       nome: "Excesso de demandas no trabalho (sobrecarga)", severidade: 4, justificativa: "" },
-      { codigo: "SUPORTE",          nome: "Falta de suporte/apoio no trabalho",        severidade: 4, justificativa: "" },
-      { codigo: "WORK_CONTENT",     nome: "Conteúdo do Trabalho",                     severidade: 4, justificativa: "" },
-      { codigo: "WORK_LIFE",        nome: "Interface Trabalho-Vida",                   severidade: 4, justificativa: "" },
+      { codigo: "SOBRECARGA",       nome: "Excesso de demandas no trabalho (sobrecarga)", severidade: 4, justificativa: "Burnout, estresse crônico, afastamento prolongado", sugestao: "Burnout, estresse crônico, afastamento prolongado" },
+      { codigo: "CONTROLE",         nome: "Baixo controle no trabalho / Falta de autonomia", severidade: 3, justificativa: "Estresse crônico, desmotivação, queda de engajamento", sugestao: "Estresse crônico, desmotivação, queda de engajamento" },
+      { codigo: "SUPORTE",          nome: "Falta de suporte/apoio no trabalho",        severidade: 4, justificativa: "Desamparo da liderança e colegas diante de demandas críticas", sugestao: "Desamparo da liderança e colegas diante de demandas críticas" },
+      { codigo: "RELACIONAMENTOS",  nome: "Maus relacionamentos no local de trabalho", severidade: 4, justificativa: "Clima tóxico, atritos frequentes entre pares e lideranças", sugestao: "Clima tóxico, atritos frequentes entre pares e lideranças" },
+      { codigo: "RECOMPENSAS",      nome: "Baixas recompensas e reconhecimento",       severidade: 2, justificativa: "Insatisfação, turnover, baixa retenção de talentos", sugestao: "Insatisfação, turnover, baixa retenção de talentos" },
+      { codigo: "CLAREZA_PAPEL",    nome: "Baixa clareza de papel/função",             severidade: 3, justificativa: "Ambiguidade de papéis, retrabalho, conflitos interpessoais", sugestao: "Ambiguidade de papéis, retrabalho, conflitos interpessoais" },
+      { codigo: "JUSTICA",          nome: "Baixa justiça organizacional",              severidade: 4, justificativa: "Percepção de injustiça procedimental, desengajamento e litígios", sugestao: "Percepção de injustiça procedimental, desengajamento e litígios" },
+      { codigo: "MUDANCA_ORG",      nome: "Má gestão de mudanças organizacionais",     severidade: 4, justificativa: "Insegurança quanto ao futuro, ansiedade coletiva", sugestao: "Insegurança quanto ao futuro, ansiedade coletiva" },
+      { codigo: "WORK_CONTENT",     nome: "Conteúdo do Trabalho e Exigências Emocionais", severidade: 3, justificativa: "Exaustão emocional decorrente do contato com público/tarefas críticas", sugestao: "Exaustão emocional decorrente do contato com público/tarefas críticas" },
+      { codigo: "WORK_LIFE",        nome: "Interface Trabalho-Vida",                   severidade: 3, justificativa: "Conflito família-trabalho, fadiga acumulada e perda de recuperação", sugestao: "Conflito família-trabalho, fadiga acumulada e perda de recuperação" },
     ]
   },
   hse: {
     label: "Framework HSE-inspired — Padrão (autoral)",
+    descricao: "6 padrões de gerenciamento do Health and Safety Executive britânico.",
     fatores: [
-      { codigo: "CLAREZA_PAPEL",    nome: "Baixa clareza de papel/função",             severidade: 4, justificativa: "" },
-      { codigo: "CONTROLE",         nome: "Baixo controle no trabalho / Falta de autonomia", severidade: 4, justificativa: "" },
-      { codigo: "MUDANCA_ORG",      nome: "Má gestão de mudanças organizacionais",     severidade: 4, justificativa: "" },
-      { codigo: "RELACIONAMENTOS",  nome: "Maus relacionamentos no local de trabalho", severidade: 4, justificativa: "" },
-      { codigo: "SOBRECARGA",       nome: "Excesso de demandas no trabalho (sobrecarga)", severidade: 4, justificativa: "" },
-      { codigo: "SUPORTE",          nome: "Falta de suporte/apoio no trabalho",        severidade: 4, justificativa: "" },
+      { codigo: "SOBRECARGA",       nome: "Demandas (Excesso de carga e ritmo)",       severidade: 4, justificativa: "Burnout, estresse crônico, risco cardiovascular", sugestao: "Burnout, estresse crônico, risco cardiovascular" },
+      { codigo: "CONTROLE",         nome: "Controle (Autonomia e participação)",       severidade: 3, justificativa: "Sensação de impotência e desmotivação funcional", sugestao: "Sensação de impotência e desmotivação funcional" },
+      { codigo: "SUPORTE",          nome: "Apoio (Suporte de gestores e colegas)",     severidade: 4, justificativa: "Isolamento profissional diante de sobrecargas operacionais", sugestao: "Isolamento profissional diante de sobrecargas operacionais" },
+      { codigo: "RELACIONAMENTOS",  nome: "Relacionamentos (Conflitos e condutas inaceitáveis)", severidade: 4, justificativa: "Desgaste interpessoal e deterioração do clima de equipe", sugestao: "Desgaste interpessoal e deterioração do clima de equipe" },
+      { codigo: "CLAREZA_PAPEL",    nome: "Papel (Compreensão da função e responsabilidades)", severidade: 3, justificativa: "Conflito de atribuições e insegurança operacional", sugestao: "Conflito de atribuições e insegurança operacional" },
+      { codigo: "MUDANCA_ORG",      nome: "Mudança (Gestão e comunicação de transições)", severidade: 4, justificativa: "Incerteza, resistência e estresse adaptativo", sugestao: "Incerteza, resistência e estresse adaptativo" },
     ]
   },
   mte: {
-    label: "MTE Psicossociais — Padrão",
+    label: "MTE Psicossociais — Padrão NR-01 (15 Fatores)",
+    descricao: "15 fatores completos estabelecidos pelo Guia de Fatores Psicossociais do MTE e NR-01.",
     fatores: [
-      { codigo: "ASSEDIO",          nome: "Assédio de qualquer natureza no trabalho",  severidade: 5, justificativa: "Risco jurídico, dano psíquico grave" },
-      { codigo: "CLAREZA_PAPEL",    nome: "Baixa clareza de papel/função",             severidade: 4, justificativa: "" },
-      { codigo: "COMUNICACAO",      nome: "Trabalho em condições de difícil comunicação", severidade: 3, justificativa: "" },
-      { codigo: "CONTROLE",         nome: "Baixo controle no trabalho / Falta de autonomia", severidade: 4, justificativa: "" },
-      { codigo: "ISOLAMENTO",       nome: "Trabalho remoto e isolado",                 severidade: 3, justificativa: "" },
-      { codigo: "JUSTICA",          nome: "Baixa justiça organizacional",              severidade: 4, justificativa: "" },
-      { codigo: "MUDANCA_ORG",      nome: "Má gestão de mudanças organizacionais",     severidade: 4, justificativa: "" },
-      { codigo: "RECOMPENSAS",      nome: "Baixas recompensas e reconhecimento",       severidade: 3, justificativa: "" },
-      { codigo: "RELACIONAMENTOS",  nome: "Maus relacionamentos no local de trabalho", severidade: 4, justificativa: "" },
-      { codigo: "SOBRECARGA",       nome: "Excesso de demandas no trabalho (sobrecarga)", severidade: 4, justificativa: "Burnout, afastamento prolongado" },
-      { codigo: "SUBCARGA",         nome: "Baixa demanda no trabalho (subcarga)",      severidade: 3, justificativa: "" },
-      { codigo: "SUPORTE",          nome: "Falta de suporte/apoio no trabalho",        severidade: 4, justificativa: "" },
-      { codigo: "VIOLENCIA_TRAUMA", nome: "Eventos violentos ou traumáticos",          severidade: 5, justificativa: "" },
+      { codigo: "ASSEDIO",          nome: "Assédio moral / sexual de qualquer natureza", severidade: 5, justificativa: "Risco jurídico, dano psíquico grave, passivo trabalhista", sugestao: "Risco jurídico, dano psíquico grave, passivo trabalhista" },
+      { codigo: "SOBRECARGA",       nome: "Excesso de demandas no trabalho (sobrecarga)", severidade: 4, justificativa: "Burnout, afastamento prolongado, estresse crônico", sugestao: "Burnout, afastamento prolongado, estresse crônico" },
+      { codigo: "CONTROLE",         nome: "Baixo controle no trabalho / Falta de autonomia", severidade: 3, justificativa: "Estresse crônico, queda de engajamento, desmotivação", sugestao: "Estresse crônico, queda de engajamento, desmotivação" },
+      { codigo: "RECOMPENSAS",      nome: "Baixas recompensas e reconhecimento",       severidade: 2, justificativa: "Insatisfação, turnover, baixa retenção de talentos", sugestao: "Insatisfação, turnover, baixa retenção de talentos" },
+      { codigo: "WORK_LIFE",        nome: "Interface trabalho-vida",                   severidade: 3, justificativa: "Conflito família-trabalho, fadiga e desequilíbrio", sugestao: "Conflito família-trabalho, fadiga e desequilíbrio" },
+      { codigo: "CLAREZA_PAPEL",    nome: "Baixa clareza de papel/função",             severidade: 3, justificativa: "Ambiguidade de papéis, retrabalho, conflitos interpessoais", sugestao: "Ambiguidade de papéis, retrabalho, conflitos interpessoais" },
+      { codigo: "COMUNICACAO",      nome: "Trabalho em condições de difícil comunicação", severidade: 3, justificativa: "Isolamento de equipes, ruídos de comunicação interna", sugestao: "Isolamento de equipes, ruídos de comunicação interna" },
+      { codigo: "ISOLAMENTO",       nome: "Trabalho remoto e isolado",                 severidade: 3, justificativa: "Sensação de isolamento social e perda de pertencimento", sugestao: "Sensação de isolamento social e perda de pertencimento" },
+      { codigo: "JUSTICA",          nome: "Baixa justiça organizacional",              severidade: 4, justificativa: "Percepção de injustiça procedimental, desengajamento e litígios", sugestao: "Percepção de injustiça procedimental, desengajamento e litígios" },
+      { codigo: "MUDANCA_ORG",      nome: "Má gestão de mudanças organizacionais",     severidade: 4, justificativa: "Insegurança quanto ao futuro, resistência e ansiedade coletiva", sugestao: "Insegurança quanto ao futuro, resistência e ansiedade coletiva" },
+      { codigo: "RELACIONAMENTOS",  nome: "Maus relacionamentos no local de trabalho", severidade: 4, justificativa: "Clima tóxico, atritos frequentes entre pares e lideranças", sugestao: "Clima tóxico, atritos frequentes entre pares e lideranças" },
+      { codigo: "SUBCARGA",         nome: "Baixa demanda no trabalho (subcarga)",      severidade: 2, justificativa: "Tédio laboral, subutilização de capacidades (boreout)", sugestao: "Tédio laboral, subutilização de capacidades (boreout)" },
+      { codigo: "SUPORTE",          nome: "Falta de suporte/apoio no trabalho",        severidade: 4, justificativa: "Desamparo da liderança e colegas diante de demandas críticas", sugestao: "Desamparo da liderança e colegas diante de demandas críticas" },
+      { codigo: "VIOLENCIA_TRAUMA", nome: "Eventos violentos ou traumáticos",          severidade: 5, justificativa: "Estresse pós-traumático (TEPT), incidentes graves de segurança", sugestao: "Estresse pós-traumático (TEPT), incidentes graves de segurança" },
+      { codigo: "INSEGURANCA",      nome: "Insegurança no emprego e instabilidade",    severidade: 3, justificativa: "Insegurança financeira percebida, ansiedade crônica", sugestao: "Insegurança financeira percebida, ansiedade crônica" },
     ]
   },
 };
@@ -1047,14 +1060,46 @@ const SEVERIDADE_FRAMEWORKS = {
 // Mock: versões de matrizes por cliente
 const MATRIZES_VERSOES = {
   loghaus: [
-    { versao: "v1.0", status: "publicada", criadaEm: "23/06/2026", publicadaEm: "23/06/2026", campanhas: 0, framework: "copsoq" },
-    { versao: "v2.0", status: "rascunho", criadaEm: "13/07/2026", publicadaEm: null, campanhas: 0, framework: "copsoq" },
+    {
+      versao: "v1.0",
+      status: "publicada",
+      criadaEm: "23/06/2026",
+      publicadaEm: "23/06/2026",
+      campanhas: 2,
+      framework: "copsoq",
+      criteriosPgr: "Matriz 5×5 padrão NR-01 / GRO. Cruzamento da Probabilidade de ocorrência (P1 a P5) apurada no diagnóstico COPSOQ com a Severidade do dano potencial (S1 a S5). Classificação em 5 faixas com priorização de medidas preventivas e corretivas."
+    },
+    {
+      versao: "v2.0",
+      status: "rascunho",
+      criadaEm: "13/07/2026",
+      publicadaEm: null,
+      campanhas: 0,
+      framework: "copsoq",
+      criteriosPgr: "Critérios calibrados para o Grau de Risco CNAE 3 (Confecção e Vestuário) considerando histórico de afastamentos por DORT e estresse ocupacional."
+    },
   ],
   vitamed: [
-    { versao: "v1.0", status: "publicada", criadaEm: "15/01/2026", publicadaEm: "15/01/2026", campanhas: 1, framework: "mte" },
+    {
+      versao: "v1.0",
+      status: "publicada",
+      criadaEm: "15/01/2026",
+      publicadaEm: "15/01/2026",
+      campanhas: 1,
+      framework: "mte",
+      criteriosPgr: "Matriz 5×5 com 15 Fatores MTE/NR-01 adaptada ao setor hospitalar/saúde privada com foco em plantões e suporte psicossocial."
+    },
   ],
   agrocorp: [
-    { versao: "v1.0", status: "rascunho", criadaEm: "10/08/2026", publicadaEm: null, campanhas: 0, framework: "copsoq" },
+    {
+      versao: "v1.0",
+      status: "rascunho",
+      criadaEm: "10/08/2026",
+      publicadaEm: null,
+      campanhas: 0,
+      framework: "mte",
+      criteriosPgr: "Configuração inicial para operações agroindustriais e unidades de campo."
+    },
   ],
 };
 
@@ -1221,7 +1266,7 @@ Object.assign(window, {
   ENTREVISTA_ESTRUTURAS, ENTREVISTA_FATORES, ENTREVISTA_MATURIDADE,
   CLASSIFICACAO_LABELS, CLASSIFICACAO_CORES, ENTREVISTAS_MOCK,
   // Frente 2 — Matriz de Risco
-  MATRIZ_CLASSIFICACOES, MATRIZ_NIVEIS, SEVERIDADE_FRAMEWORKS,
+  MATRIZ_CLASSIFICACOES, MATRIZ_NIVEIS, SEVERIDADE_NIVEIS, SEVERIDADE_FRAMEWORKS,
   MATRIZES_VERSOES, calcularResultadoMatriz,
   // Frente 3 — Canal de Denúncias
   TIPOS_DENUNCIA, DENUNCIA_STATUS, DENUNCIA_GRAVIDADE,
