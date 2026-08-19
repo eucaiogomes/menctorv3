@@ -119,63 +119,20 @@ const CampanhasScreen = ({ navigate }) => {
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {campanhas.map(c => {
-            const cliente = clienteById(c.clienteId);
-            const diagnostico = diagnosticoById(c.diagnosticoId);
-            const respondidos = getCampanhaRespondidos(c);
-            const pct = c.quantidadeFuncionarios ? Math.min(100, Math.round((respondidos / c.quantidadeFuncionarios) * 100)) : 0;
-            const completa = respondidos >= c.quantidadeFuncionarios;
-            const statusEfetivo = getCampanhaStatusEfetivo(c);
-            const encerradaPorPrazo = statusEfetivo === "encerrada" && !completa;
-            return (
-              <div key={c.id} className="card" style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-                <div style={{ flex: 1, minWidth: 260 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                    <span style={{ fontFamily: "var(--display)", fontWeight: 600, fontSize: 17, color: "var(--ink)" }}>{c.titulo}</span>
-                    {encerradaPorPrazo ? (
-                      <span className="pill pill-neutral" style={{ fontSize: 10.5 }}>Encerrada</span>
-                    ) : (
-                      <span className={`pill ${c.status === "ativa" ? "pill-brand" : "pill-neutral"}`} style={{ fontSize: 10.5 }}>{c.status === "ativa" ? "Ativa" : "Inativa"}</span>
-                    )}
-                    {completa && <span className="pill pill-sky" style={{ fontSize: 10.5 }}>Meta atingida</span>}
-                  </div>
-                  <div style={{ marginTop: 4, fontSize: 12.5, color: "var(--ink-muted)", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                    <span>{cliente ? cliente.name : "Empresa removida"}</span>
-                    <span>·</span>
-                    <span>{diagnostico ? diagnostico.name : "Diagnóstico removido"}</span>
-                    <span>·</span>
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><Icon name="calendar" size={12} /> {fmtData(c.dataInicial)} – {fmtData(c.dataFinal)}</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 9, maxWidth: 320 }}>
-                    <div style={{ flex: 1, height: 5, borderRadius: 999, background: "var(--line)", overflow: "hidden" }}>
-                      <div style={{ height: "100%", width: `${pct}%`, borderRadius: 999, background: completa ? "var(--health)" : "var(--accent)", transition: "width .4s ease" }} />
-                    </div>
-                    <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--ink-muted)", whiteSpace: "nowrap" }}>
-                      <Icon name="users" size={11} style={{ marginRight: 3, verticalAlign: -1 }} />{respondidos} / {c.quantidadeFuncionarios} ({pct}%)
-                    </span>
-                  </div>
-                </div>
-                {completa ? (
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <button onClick={() => navigate && navigate("campanha-resultado", { campanhaId: c.id })} className="btn btn-accent" style={{ height: 34, fontSize: 12.5 }}>
-                      <Icon name="bar-chart" size={13} /> Resultado final
-                    </button>
-                    <button onClick={() => navigate && navigate("relatorios", { clienteId: c.clienteId })} className="btn btn-soft" style={{ height: 34, fontSize: 12.5 }}>
-                      <Icon name="file" size={13} /> Relatório
-                    </button>
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <Toggle on={c.status === "ativa"} onChange={() => toggleStatus(c.id)} />
-                    <button onClick={() => setLinkFor(c)} className="btn btn-soft" style={{ height: 34, fontSize: 12.5 }}><Icon name="link" size={13} /> Link</button>
-                    <button onClick={() => duplicar(c)} title="Duplicar" style={{ width: 34, height: 34, borderRadius: 9, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--ink-muted)" }}><Icon name="clipboard" size={15} /></button>
-                    <button onClick={() => setEditing(c)} title="Editar" style={{ width: 34, height: 34, borderRadius: 9, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--ink-muted)" }}><Icon name="edit" size={15} /></button>
-                    <button onClick={() => excluir(c)} title="Excluir" style={{ width: 34, height: 34, borderRadius: 9, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--coral)" }}><Icon name="trash" size={15} /></button>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          {campanhas.map(c => (
+            <CampanhaRow
+              key={c.id}
+              campanha={c}
+              cliente={clienteById(c.clienteId)}
+              diagnostico={diagnosticoById(c.diagnosticoId)}
+              navigate={navigate}
+              onToggleStatus={toggleStatus}
+              onLink={setLinkFor}
+              onDuplicar={duplicar}
+              onEditar={setEditing}
+              onExcluir={excluir}
+            />
+          ))}
         </div>
       )}
 
@@ -199,6 +156,66 @@ const CampanhasScreen = ({ navigate }) => {
 };
 
 // ════════════════════════════════════════════════════════════
+// LINHA DE CAMPANHA (diagnóstico com link/CPF/período)
+// ════════════════════════════════════════════════════════════
+const CampanhaRow = ({ campanha: c, cliente, diagnostico, navigate, onToggleStatus, onLink, onDuplicar, onEditar, onExcluir }) => {
+  const respondidos = getCampanhaRespondidos(c);
+  const pct = c.quantidadeFuncionarios ? Math.min(100, Math.round((respondidos / c.quantidadeFuncionarios) * 100)) : 0;
+  const completa = respondidos >= c.quantidadeFuncionarios;
+  const statusEfetivo = getCampanhaStatusEfetivo(c);
+  const encerradaPorPrazo = statusEfetivo === "encerrada" && !completa;
+
+  return (
+    <div className="card" style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+      <div style={{ flex: 1, minWidth: 260 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <span style={{ fontFamily: "var(--display)", fontWeight: 600, fontSize: 17, color: "var(--ink)" }}>{c.titulo}</span>
+          {encerradaPorPrazo ? (
+            <span className="pill pill-neutral" style={{ fontSize: 10.5 }}>Encerrada</span>
+          ) : (
+            <span className={`pill ${c.status === "ativa" ? "pill-brand" : "pill-neutral"}`} style={{ fontSize: 10.5 }}>{c.status === "ativa" ? "Ativa" : "Inativa"}</span>
+          )}
+          {completa && <span className="pill pill-sky" style={{ fontSize: 10.5 }}>Meta atingida</span>}
+        </div>
+        <div style={{ marginTop: 4, fontSize: 12.5, color: "var(--ink-muted)", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <span>{cliente ? cliente.name : "Empresa removida"}</span>
+          <span>·</span>
+          <span>{diagnostico ? diagnostico.name : "Diagnóstico removido"}</span>
+          <span>·</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><Icon name="calendar" size={12} /> {fmtData(c.dataInicial)} – {fmtData(c.dataFinal)}</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 9, maxWidth: 320 }}>
+          <div style={{ flex: 1, height: 5, borderRadius: 999, background: "var(--line)", overflow: "hidden" }}>
+            <div style={{ height: "100%", width: `${pct}%`, borderRadius: 999, background: completa ? "var(--health)" : "var(--accent)", transition: "width .4s ease" }} />
+          </div>
+          <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--ink-muted)", whiteSpace: "nowrap" }}>
+            <Icon name="users" size={11} style={{ marginRight: 3, verticalAlign: -1 }} />{respondidos} / {c.quantidadeFuncionarios} ({pct}%)
+          </span>
+        </div>
+      </div>
+      {completa ? (
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <button onClick={() => navigate && navigate("campanha-resultado", { campanhaId: c.id })} className="btn btn-accent" style={{ height: 34, fontSize: 12.5 }}>
+            <Icon name="bar-chart" size={13} /> Resultado final
+          </button>
+          <button onClick={() => navigate && navigate("relatorios", { clienteId: c.clienteId })} className="btn btn-soft" style={{ height: 34, fontSize: 12.5 }}>
+            <Icon name="file" size={13} /> Relatório
+          </button>
+        </div>
+      ) : (
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <Toggle on={c.status === "ativa"} onChange={() => onToggleStatus(c.id)} />
+          <button onClick={() => onLink(c)} className="btn btn-soft" style={{ height: 34, fontSize: 12.5 }}><Icon name="link" size={13} /> Link</button>
+          <button onClick={() => onDuplicar(c)} title="Duplicar" style={{ width: 34, height: 34, borderRadius: 9, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--ink-muted)" }}><Icon name="clipboard" size={15} /></button>
+          <button onClick={() => onEditar(c)} title="Editar" style={{ width: 34, height: 34, borderRadius: 9, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--ink-muted)" }}><Icon name="edit" size={15} /></button>
+          <button onClick={() => onExcluir(c)} title="Excluir" style={{ width: 34, height: 34, borderRadius: 9, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--coral)" }}><Icon name="trash" size={15} /></button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ════════════════════════════════════════════════════════════
 // NOVA CAMPANHA — modal de criação/edição
 // ════════════════════════════════════════════════════════════
 const NovaCampanhaModal = ({ initial, onClose, onSave }) => {
@@ -212,9 +229,17 @@ const NovaCampanhaModal = ({ initial, onClose, onSave }) => {
   const [ativa, setAtiva] = React.useState(initial ? initial.status === "ativa" : true);
 
   const cliente = CLIENTES.find(c => c.id === clienteId);
-  const diagnosticosDisponiveis = cliente
-    ? DIAGNOSTICOS.filter(d => (cliente.diagnosticosHabilitados || []).includes(d.id))
-    : [];
+  const diagnosticosDisponiveis = React.useMemo(() => {
+    if (!cliente) return [];
+    const habilitados = DIAGNOSTICOS.filter(d => (cliente.diagnosticosHabilitados || []).includes(d.id));
+    const entrevistaDiag = DIAGNOSTICOS.find(d => d.id === "entrevista");
+    // Entrevista também roda como campanha de link, disponível para qualquer
+    // empresa, independente dos diagnósticos habilitados.
+    if (entrevistaDiag && !habilitados.some(d => d.id === "entrevista")) {
+      return [...habilitados, entrevistaDiag];
+    }
+    return habilitados;
+  }, [cliente]);
 
   React.useEffect(() => {
     // se trocar de empresa e o diagnóstico atual não estiver mais disponível, limpa

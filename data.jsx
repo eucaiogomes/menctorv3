@@ -439,16 +439,17 @@ const ROADMAP_ESTADO = {
 
 // ════════════════════════════════════════════════════════════
 // NOVAS ETAPAS DO CLIENTE (aba Clientes) — conforme solicitado
-// 7 etapas lineares com foco em UX clara e aceites
+// 8 etapas lineares com foco em UX clara, aceites e entrevistas
 // ════════════════════════════════════════════════════════════
 const CLIENTE_ETAPAS = [
   { n: 1, label: "Cadastro", desc: "Dados completos da empresa e contexto de riscos psicossociais" },
   { n: 2, label: "Proposta", desc: "Visualizar proposta e enviar link para aceite do cliente" },
   { n: 3, label: "Contrato", desc: "Contrato com aceite digital do cliente" },
   { n: 4, label: "Sensibilização", desc: "Palestra, treinamento e trilha" },
-  { n: 5, label: "Diagnóstico", desc: "Seleção de instrumentos: COPSOQ II, DRPS e Clima" },
-  { n: 6, label: "Relatórios", desc: "Disponível após diagnóstico (desabilitado no cadastro)" },
-  { n: 7, label: "Apresentação", desc: "Reunião de discussão do plano de ação" },
+  { n: 5, label: "Diagnóstico", desc: "Seleção de instrumentos: COPSOQ II, HSE, Entrevista, DRPS e Clima" },
+  { n: 6, label: "Entrevistas", desc: "Avaliação qualitativa dos 12 fatores psicossociais e maturidade NR-1" },
+  { n: 7, label: "Relatórios", desc: "Disponível após diagnóstico e entrevistas (desabilitado no cadastro)" },
+  { n: 8, label: "Apresentação", desc: "Reunião de discussão do plano de ação" },
 ];
 
 const ETAPAS_ESTADO_INICIAL = () => ({
@@ -459,27 +460,29 @@ const ETAPAS_ESTADO_INICIAL = () => ({
     3: { status: "pendente", aceito: false },
     4: { status: "pendente", sensibilizacoes: { palestra: false, treinamento: false, trilha: false } },
     5: { status: "pendente", instrumentos: [] },
-    6: { status: "pendente", habilitado: false },
-    7: { status: "pendente", reuniaoAgendada: false, data: "", obs: "" },
+    6: { status: "pendente" },
+    7: { status: "pendente", habilitado: false },
+    8: { status: "pendente", reuniaoAgendada: false, data: "", obs: "" },
   },
 });
 
 // Initial per-client etapas state (extend existing clients)
 const ETAPAS_CLIENTE = {
-  // Exemplo de demonstração: diagnóstico já concluído, Relatórios liberado com gráficos reais
+  // Exemplo de demonstração: diagnóstico e entrevistas concluídos, Relatórios liberado com gráficos reais
   loghaus: {
-    etapaAtual: 6,
+    etapaAtual: 7,
     status: {
       1: { status: "concluida", aceito: true, data: "12/05/2026" },
       2: { status: "concluida", aceito: true, data: "18/05/2026" },
       3: { status: "concluida", aceito: true, data: "22/05/2026" },
       4: { status: "concluida", sensibilizacoes: { palestra: true, treinamento: true, trilha: true } },
-      5: { status: "concluida", instrumentos: ["copsoqii"] },
-      6: { status: "pendente", habilitado: true },
-      7: { status: "pendente", reuniaoAgendada: false, data: "", obs: "" },
+      5: { status: "concluida", instrumentos: ["copsoqii", "entrevista"] },
+      6: { status: "concluida", concluidas: 2, total: 2 },
+      7: { status: "pendente", habilitado: true },
+      8: { status: "pendente", reuniaoAgendada: false, data: "", obs: "" },
     },
   },
-  // Exemplo de demonstração: diagnóstico já concluído, Relatórios liberado com gráficos reais
+  // Exemplo de demonstração: diagnóstico já concluído com entrevista liberada
   vitamed: {
     etapaAtual: 6,
     status: {
@@ -487,9 +490,10 @@ const ETAPAS_CLIENTE = {
       2: { status: "concluida", aceito: true, data: "10/01/2026" },
       3: { status: "concluida", aceito: true, data: "12/01/2026" },
       4: { status: "concluida", sensibilizacoes: { palestra: true, treinamento: true, trilha: true } },
-      5: { status: "concluida", instrumentos: ["copsoqii", "clima"] },
-      6: { status: "pendente", habilitado: true },
-      7: { status: "pendente", reuniaoAgendada: false, data: "", obs: "" },
+      5: { status: "concluida", instrumentos: ["copsoqii", "entrevista", "clima"] },
+      6: { status: "em_andamento" },
+      7: { status: "pendente", habilitado: true },
+      8: { status: "pendente", reuniaoAgendada: false, data: "", obs: "" },
     },
   },
   agrocorp: {
@@ -500,8 +504,9 @@ const ETAPAS_CLIENTE = {
       3: { status: "pendente", aceito: false },
       4: { status: "pendente", sensibilizacoes: { palestra: false, treinamento: false, trilha: false } },
       5: { status: "pendente", instrumentos: [] },
-      6: { status: "pendente", habilitado: false },
-      7: { status: "pendente", reuniaoAgendada: false, data: "", obs: "" },
+      6: { status: "pendente" },
+      7: { status: "pendente", habilitado: false },
+      8: { status: "pendente", reuniaoAgendada: false, data: "", obs: "" },
     },
   },
 };
@@ -976,6 +981,121 @@ const ENTREVISTAS_MOCK = [
 ];
 
 // ════════════════════════════════════════════════════════════
+// ENTREVISTAS COM MÚLTIPLOS PARTICIPANTES — normalização e agregação
+// Uma entrevista pode reunir várias pessoas (qtdPessoas); cada uma responde
+// os 12 fatores individualmente e o resultado final agrega as respostas.
+// ════════════════════════════════════════════════════════════
+
+const criarParticipantesEntrevista = (qtd) => {
+  const n = Math.max(1, Number(qtd) || 1);
+  return Array.from({ length: n }, (_, i) => ({
+    id: `p${i + 1}`,
+    nome: `Pessoa ${i + 1}`,
+    fatoresAvaliados: {},
+  }));
+};
+
+// Entrevistas antigas guardavam fatoresAvaliados direto no objeto (sem
+// participantes) — tratamos esse caso como um único participante, para
+// manter compatibilidade com registros já existentes.
+const getEntrevistaParticipantes = (entrevista) => {
+  if (entrevista?.participantes?.length) return entrevista.participantes;
+  return [{ id: "p1", nome: "Pessoa 1", fatoresAvaliados: entrevista?.fatoresAvaliados || {} }];
+};
+
+// Agrega as respostas de todos os participantes por fator: média das
+// classificações dadas, e crítico se qualquer participante marcou 4 ou 5.
+const agregarFatoresEntrevista = (entrevista) => {
+  const participantes = getEntrevistaParticipantes(entrevista);
+  const agregados = {};
+  ENTREVISTA_FATORES.forEach(fator => {
+    const respostas = participantes
+      .map(p => ({ participante: p, dado: p.fatoresAvaliados?.[fator.id] }))
+      .filter(r => r.dado?.classificacao);
+    if (respostas.length === 0) return;
+    const media = respostas.reduce((s, r) => s + r.dado.classificacao, 0) / respostas.length;
+    const maxClassificacao = Math.max(...respostas.map(r => r.dado.classificacao));
+    agregados[fator.id] = {
+      fator,
+      media,
+      classificacaoArredondada: Math.min(5, Math.max(1, Math.round(media))),
+      maxClassificacao,
+      isCritico: maxClassificacao >= 4,
+      totalRespostas: respostas.length,
+      respostas: respostas.map(r => ({
+        participanteId: r.participante.id,
+        participanteNome: r.participante.nome,
+        classificacao: r.dado.classificacao,
+        observacoes: r.dado.observacoes,
+      })),
+    };
+  });
+  return agregados;
+};
+
+// Progresso: quantas respostas (pessoa × fator) já foram registradas, e
+// quantos participantes já concluíram os 12 fatores.
+const calcularProgressoEntrevista = (entrevista) => {
+  const participantes = getEntrevistaParticipantes(entrevista);
+  const totalFatores = ENTREVISTA_FATORES.length;
+  let totalRespondido = 0;
+  let participantesConcluidos = 0;
+  participantes.forEach(p => {
+    const count = Object.values(p.fatoresAvaliados || {}).filter(f => f?.classificacao).length;
+    totalRespondido += count;
+    if (count === totalFatores) participantesConcluidos += 1;
+  });
+  const totalPossivel = totalFatores * participantes.length;
+  return {
+    totalParticipantes: participantes.length,
+    participantesConcluidos,
+    totalRespondido,
+    totalPossivel,
+    pct: totalPossivel ? Math.round((totalRespondido / totalPossivel) * 100) : 0,
+  };
+};
+
+// Calcula o nível de maturidade CERTIFICA NR-1 a partir da agregação por fator
+// (mesmos critérios de antes, agora aplicados sobre a média entre pessoas).
+const calcularMaturidadeEntrevista = (entrevista) => {
+  const agregados = agregarFatoresEntrevista(entrevista);
+  const avaliadosList = Object.values(agregados);
+  if (avaliadosList.length === 0) return null;
+
+  const media = avaliadosList.reduce((acc, cur) => acc + cur.media, 0) / avaliadosList.length;
+  const criticosCount = avaliadosList.filter(a => a.isCritico).length;
+  const temGrave = avaliadosList.some(a => (a.fator.id === "assedio" || a.fator.id === "lideranca_abusiva") && a.isCritico);
+
+  let nivelId = 1;
+  if (media >= 3.8 || (temGrave && criticosCount >= 2)) {
+    nivelId = 4;
+  } else if (media >= 2.8 || criticosCount >= 3 || temGrave) {
+    nivelId = 3;
+  } else if (media >= 1.8 || criticosCount >= 1) {
+    nivelId = 2;
+  }
+
+  const nivelObj = ENTREVISTA_MATURIDADE.find(n => n.nivel === nivelId) || ENTREVISTA_MATURIDADE[0];
+
+  const calcAvgEstrutura = (estruturaId) => {
+    const arr = avaliadosList.filter(a => a.fator.estruturaId === estruturaId);
+    return arr.length ? (arr.reduce((s, i) => s + i.media, 0) / arr.length).toFixed(2) : "—";
+  };
+
+  return {
+    media: media.toFixed(2),
+    nivel: nivelObj,
+    totalAvaliados: avaliadosList.length,
+    mediasPorEstrutura: {
+      relacoes: calcAvgEstrutura("relacoes"),
+      atividades: calcAvgEstrutura("atividades"),
+      organizacional: calcAvgEstrutura("organizacional"),
+    },
+    fatoresCriticos: avaliadosList.filter(a => a.isCritico),
+  };
+};
+
+// ════════════════════════════════════════════════════════════
 // FRENTE 2 — MATRIZ DE RISCO E SEVERIDADE
 // ════════════════════════════════════════════════════════════
 
@@ -1265,6 +1385,8 @@ Object.assign(window, {
   // Frente 1 — Entrevistas
   ENTREVISTA_ESTRUTURAS, ENTREVISTA_FATORES, ENTREVISTA_MATURIDADE,
   CLASSIFICACAO_LABELS, CLASSIFICACAO_CORES, ENTREVISTAS_MOCK,
+  criarParticipantesEntrevista, getEntrevistaParticipantes,
+  agregarFatoresEntrevista, calcularProgressoEntrevista, calcularMaturidadeEntrevista,
   // Frente 2 — Matriz de Risco
   MATRIZ_CLASSIFICACOES, MATRIZ_NIVEIS, SEVERIDADE_NIVEIS, SEVERIDADE_FRAMEWORKS,
   MATRIZES_VERSOES, calcularResultadoMatriz,

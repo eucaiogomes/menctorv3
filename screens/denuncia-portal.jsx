@@ -1,4 +1,4 @@
-/* global React, Icon, Page, CLIENTES, TIPOS_DENUNCIA, DENUNCIA_STATUS, DENUNCIAS_MOCK */
+/* global React, Icon, Page, CLIENTES, TIPOS_DENUNCIA, DENUNCIA_STATUS, DENUNCIAS_MOCK, MenctorDB */
 const { useState, useMemo } = React;
 
 const DenunciaPortalPage = ({ navigate }) => {
@@ -20,10 +20,15 @@ const DenunciaPortalPage = ({ navigate }) => {
   const [termoFinal, setTermoFinal] = useState(false);
   const [geradoProtocolo, setGeradoProtocolo] = useState("");
 
+  // Envio da denúncia
+  const [enviando, setEnviando] = useState(false);
+  const [enviarError, setEnviarError] = useState("");
+
   // Protocol lookup modal
   const [lookupProtocolo, setLookupProtocolo] = useState("");
   const [casoConsultado, setCasoConsultado] = useState(null);
   const [lookupError, setLookupError] = useState(false);
+  const [lookupLoading, setLookupLoading] = useState(false);
 
   // Material de apoio modal
   const [materialModal, setMaterialModal] = useState(null);
@@ -38,9 +43,9 @@ const DenunciaPortalPage = ({ navigate }) => {
     setTermoFinal(false);
   };
 
-  const handleEnviarDenuncia = (e) => {
+  const handleEnviarDenuncia = async (e) => {
     e.preventDefault();
-    if (!termoFinal) return;
+    if (!termoFinal || enviando) return;
 
     // Generate protocol code like DEN-2026-0842
     const numPart = Math.floor(1000 + Math.random() * 9000);
@@ -81,25 +86,27 @@ const DenunciaPortalPage = ({ navigate }) => {
       ]
     };
 
-    // Save
+    setEnviando(true);
+    setEnviarError("");
     try {
-      const saved = localStorage.getItem("MENCTOR_DENUNCIAS");
-      const list = saved ? JSON.parse(saved) : DENUNCIAS_MOCK;
-      localStorage.setItem("MENCTOR_DENUNCIAS", JSON.stringify([novaDenuncia, ...list]));
-    } catch (err) { /* ignore */ }
-
-    setGeradoProtocolo(prot);
-    setStep(3);
+      await MenctorDB.upsertDenuncia(novaDenuncia);
+      setGeradoProtocolo(prot);
+      setStep(3);
+    } catch (err) {
+      console.error("Erro ao registrar denúncia", err);
+      setEnviarError("Não foi possível registrar seu relato agora. Verifique sua conexão e tente novamente.");
+    } finally {
+      setEnviando(false);
+    }
   };
 
-  const handleConsultarProtocolo = (e) => {
+  const handleConsultarProtocolo = async (e) => {
     e.preventDefault();
-    if (!lookupProtocolo.trim()) return;
+    if (!lookupProtocolo.trim() || lookupLoading) return;
 
+    setLookupLoading(true);
     try {
-      const saved = localStorage.getItem("MENCTOR_DENUNCIAS");
-      const list = saved ? JSON.parse(saved) : DENUNCIAS_MOCK;
-      const found = list.find(d => d.protocolo.toLowerCase() === lookupProtocolo.trim().toLowerCase());
+      const found = await MenctorDB.getDenunciaByProtocolo(lookupProtocolo.trim().toUpperCase());
       if (found) {
         setCasoConsultado(found);
         setLookupError(false);
@@ -108,8 +115,11 @@ const DenunciaPortalPage = ({ navigate }) => {
         setLookupError(true);
       }
     } catch (err) {
+      console.error("Erro ao consultar protocolo", err);
       setCasoConsultado(null);
       setLookupError(true);
+    } finally {
+      setLookupLoading(false);
     }
   };
 
@@ -129,12 +139,7 @@ const DenunciaPortalPage = ({ navigate }) => {
     };
 
     setCasoConsultado(updated);
-    try {
-      const saved = localStorage.getItem("MENCTOR_DENUNCIAS");
-      const list = saved ? JSON.parse(saved) : DENUNCIAS_MOCK;
-      const nextList = list.map(d => d.id === updated.id ? updated : d);
-      localStorage.setItem("MENCTOR_DENUNCIAS", JSON.stringify(nextList));
-    } catch (err) { /* ignore */ }
+    MenctorDB.upsertDenuncia(updated).catch(err => console.warn("Falha ao sincronizar mensagem", err));
 
     setLookupChatMsg("");
   };
@@ -765,6 +770,7 @@ const DenunciaPortalPage = ({ navigate }) => {
 
                 <button
                   type="submit"
+                  disabled={lookupLoading}
                   style={{
                     width: "100%",
                     height: 42,
@@ -775,14 +781,15 @@ const DenunciaPortalPage = ({ navigate }) => {
                     fontSize: 13,
                     fontWeight: 700,
                     letterSpacing: "0.04em",
-                    cursor: "pointer",
+                    cursor: lookupLoading ? "not-allowed" : "pointer",
+                    opacity: lookupLoading ? 0.7 : 1,
                     boxShadow: "0 4px 12px rgba(246,107,10,0.28)",
                     transition: "all .15s ease"
                   }}
-                  onMouseEnter={e => e.currentTarget.style.opacity = "0.92"}
-                  onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+                  onMouseEnter={e => !lookupLoading && (e.currentTarget.style.opacity = "0.92")}
+                  onMouseLeave={e => !lookupLoading && (e.currentTarget.style.opacity = "1")}
                 >
-                  CONSULTAR PROTOCOLO
+                  {lookupLoading ? "CONSULTANDO..." : "CONSULTAR PROTOCOLO"}
                 </button>
               </form>
 
@@ -1131,26 +1138,29 @@ const DenunciaPortalPage = ({ navigate }) => {
                   </label>
                 </div>
 
+                {enviarError && (
+                  <div style={{ marginTop: 6, fontSize: 12.5, color: "#DC2626", fontWeight: 600 }}>{enviarError}</div>
+                )}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 6 }}>
                   <button type="button" onClick={() => setStep(1)} className="btn btn-soft" style={{ height: 38, fontSize: 13 }}>
                     ← Voltar
                   </button>
                   <button
                     type="submit"
-                    disabled={!termoFinal || !descricaoRelato.trim()}
+                    disabled={!termoFinal || !descricaoRelato.trim() || enviando}
                     style={{
                       height: 40,
                       padding: "0 22px",
                       borderRadius: 8,
-                      background: termoFinal && descricaoRelato.trim() ? "linear-gradient(135deg, #FF6A00, #F66B0A)" : "#CBD5E1",
+                      background: termoFinal && descricaoRelato.trim() && !enviando ? "linear-gradient(135deg, #FF6A00, #F66B0A)" : "#CBD5E1",
                       border: "none",
                       color: "#FFFFFF",
                       fontSize: 13,
                       fontWeight: 700,
-                      cursor: termoFinal && descricaoRelato.trim() ? "pointer" : "not-allowed"
+                      cursor: termoFinal && descricaoRelato.trim() && !enviando ? "pointer" : "not-allowed"
                     }}
                   >
-                    Enviar Denúncia com Segurança
+                    {enviando ? "Enviando..." : "Enviar Denúncia com Segurança"}
                   </button>
                 </div>
               </form>

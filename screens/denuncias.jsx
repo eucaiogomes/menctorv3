@@ -1,5 +1,5 @@
-/* global React, Icon, Page, CLIENTES, TIPOS_DENUNCIA, DENUNCIA_STATUS, DENUNCIA_GRAVIDADE, DENUNCIAS_MOCK, GOVERNANCA_COMITES, GOVERNANCA_POLITICAS */
-const { useState, useMemo } = React;
+/* global React, Icon, Page, CLIENTES, TIPOS_DENUNCIA, DENUNCIA_STATUS, DENUNCIA_GRAVIDADE, DENUNCIAS_MOCK, GOVERNANCA_COMITES, GOVERNANCA_POLITICAS, MenctorDB */
+const { useState, useMemo, useEffect } = React;
 
 const DenunciasScreen = ({ navigate }) => {
   const [activeTab, setActiveTab] = useState("dashboard"); // "dashboard", "casos", "governanca", "gestao"
@@ -13,13 +13,24 @@ const DenunciasScreen = ({ navigate }) => {
   const [filterCliente, setFilterCliente] = useState("todos");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const [denuncias, setDenuncias] = useState(() => {
-    try {
-      const saved = localStorage.getItem("MENCTOR_DENUNCIAS");
-      if (saved) return JSON.parse(saved);
-    } catch (e) { /* ignore */ }
-    return DENUNCIAS_MOCK;
-  });
+  const [denuncias, setDenuncias] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const rows = await MenctorDB.listDenuncias();
+        if (active) setDenuncias(rows);
+      } catch (e) {
+        console.error("Erro ao carregar denúncias", e);
+        if (active) setDenuncias(DENUNCIAS_MOCK);
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+    return () => { active = false; };
+  }, []);
 
   // KPIs
   const kpis = useMemo(() => {
@@ -247,8 +258,14 @@ const DenunciasScreen = ({ navigate }) => {
         })}
       </div>
 
+      {loading && (
+        <div style={{ padding: 40, textAlign: "center", color: "var(--ink-muted)" }}>
+          Carregando denúncias...
+        </div>
+      )}
+
       {/* ─── TAB 1: DASHBOARD ─── */}
-      {activeTab === "dashboard" && (
+      {!loading && activeTab === "dashboard" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
 
           {/* 1. 4 KPI Cards */}
@@ -718,7 +735,7 @@ const DenunciasScreen = ({ navigate }) => {
       )}
 
       {/* ─── TAB 2: CASOS ─── */}
-      {activeTab === "casos" && (
+      {!loading && activeTab === "casos" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
             <div style={{ position: "relative", flex: "1 1 220px" }}>

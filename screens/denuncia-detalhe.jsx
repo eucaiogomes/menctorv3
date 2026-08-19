@@ -1,5 +1,5 @@
-/* global React, Icon, Page, CLIENTES, TIPOS_DENUNCIA, DENUNCIA_STATUS, DENUNCIA_GRAVIDADE, DENUNCIAS_MOCK */
-const { useState, useMemo } = React;
+/* global React, Icon, Page, CLIENTES, TIPOS_DENUNCIA, DENUNCIA_STATUS, DENUNCIA_GRAVIDADE, DENUNCIAS_MOCK, MenctorDB */
+const { useState, useMemo, useEffect } = React;
 
 const ETAPAS_PADRAO = [
   { id: "triagem", nome: "Triagem e Análise Preliminar", icone: "search", cor: "#2A6FDB", ajuda: "Verificar se há elementos mínimos de autoria e materialidade antes de dar prosseguimento." },
@@ -15,13 +15,24 @@ const ETAPAS_PADRAO = [
 const DenunciaDetalheScreen = ({ navigate, id: paramId, params = {} }) => {
   const casoId = paramId || params.id || "den-001";
 
-  const [denuncias, setDenuncias] = useState(() => {
-    try {
-      const saved = localStorage.getItem("MENCTOR_DENUNCIAS");
-      if (saved) return JSON.parse(saved);
-    } catch (e) { /* ignore */ }
-    return DENUNCIAS_MOCK;
-  });
+  const [denuncias, setDenuncias] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const rows = await MenctorDB.listDenuncias();
+        if (active) setDenuncias(rows);
+      } catch (e) {
+        console.error("Erro ao carregar denúncias", e);
+        if (active) setDenuncias(DENUNCIAS_MOCK);
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+    return () => { active = false; };
+  }, []);
 
   const caso = useMemo(() => {
     return denuncias.find(d => d.id === casoId) || denuncias[0] || DENUNCIAS_MOCK[0];
@@ -47,13 +58,12 @@ const DenunciaDetalheScreen = ({ navigate, id: paramId, params = {} }) => {
   const [resultadoClassif, setResultadoClassif] = useState(caso.resultado || "procedente");
   const [recomendacoesTexto, setRecomendacoesTexto] = useState(caso.recomendacoes || "");
 
-  // Helper to persist updates
+  // Helper to persist updates: atualiza a lista local na hora (otimista) e
+  // sincroniza com o Supabase em segundo plano.
   const saveCaso = (updatedCaso) => {
     const updatedList = denuncias.map(d => d.id === updatedCaso.id ? updatedCaso : d);
     setDenuncias(updatedList);
-    try {
-      localStorage.setItem("MENCTOR_DENUNCIAS", JSON.stringify(updatedList));
-    } catch (e) { /* ignore */ }
+    MenctorDB.upsertDenuncia(updatedCaso).catch(err => console.warn("Falha ao sincronizar denúncia", err));
   };
 
   const handleSalvarAndamento = (e) => {
@@ -67,8 +77,8 @@ const DenunciaDetalheScreen = ({ navigate, id: paramId, params = {} }) => {
       descricao: andamentoFeedback,
       responsavel: "Ana Paula (Compliance)",
       visibilidade: andamentoVisibilidade,
-      notificadoComite,
-      notificadoDenunciante,
+      notificadoComite: notificarComite,
+      notificadoDenunciante: notificarDenunciante,
       anexo: andamentoAnexo ? andamentoAnexo.name : null
     };
 
@@ -131,6 +141,14 @@ const DenunciaDetalheScreen = ({ navigate, id: paramId, params = {} }) => {
     saveCaso(updated);
     setRightTab("processo");
   };
+
+  if (loading) {
+    return (
+      <Page>
+        <div style={{ padding: 40, textAlign: "center", color: "var(--ink-muted)" }}>Carregando denúncia...</div>
+      </Page>
+    );
+  }
 
   const st = DENUNCIA_STATUS[caso.status];
   const dtRelato = new Date(caso.data);

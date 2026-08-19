@@ -8,11 +8,11 @@ const { useState, useEffect } = React;
 const getRoadmapProgress = (c) => {
   if (!c) return null;
   const etapaNum = c.current_step || 1;
-  const labels = ["", "Cadastro", "Proposta", "Contrato", "Sensibilização", "Diagnóstico", "Relatórios", "Apresentação"];
-  const pct = Math.round(((etapaNum - 1) / 7) * 100);
+  const labels = ["", "Cadastro", "Proposta", "Contrato", "Sensibilização", "Diagnóstico", "Entrevistas", "Relatórios", "Apresentação"];
+  const pct = Math.round(((etapaNum - 1) / 8) * 100);
   return {
     etapaAtual: etapaNum,
-    totalEtapas: 7,
+    totalEtapas: 8,
     etapaLabel: labels[etapaNum] || `Etapa ${etapaNum}`,
     pct,
     faseNumero: Math.min(3, Math.ceil(etapaNum / 3)),
@@ -21,7 +21,7 @@ const getRoadmapProgress = (c) => {
 };
 
 
-const ETAPA_LABELS = ["", "Cadastro", "Proposta", "Contrato", "Sensibilização", "Diagnóstico", "Relatórios", "Apresentação"];
+const ETAPA_LABELS = ["", "Cadastro", "Proposta", "Contrato", "Sensibilização", "Diagnóstico", "Entrevistas", "Relatórios", "Apresentação"];
 
 const FILTERS = [
   { id: "todos",      label: "Todos" },

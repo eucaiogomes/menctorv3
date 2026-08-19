@@ -1,9 +1,9 @@
-/* global React, Icon, Page, CLIENTES, CLIENTE_ETAPAS, ETAPAS_CLIENTE, PortalPropostaScreen, PortalContratoScreen, RiskMedallion, getDiagnosticoResultadoMock */
-const { useState, useEffect, useRef } = React;
+/* global React, Icon, Page, CLIENTES, CLIENTE_ETAPAS, ETAPAS_CLIENTE, PortalPropostaScreen, PortalContratoScreen, RiskMedallion, getDiagnosticoResultadoMock, ENTREVISTA_ESTRUTURAS, ENTREVISTA_FATORES, ENTREVISTA_MATURIDADE, CLASSIFICACAO_LABELS, CLASSIFICACAO_CORES, ENTREVISTAS_MOCK, criarParticipantesEntrevista, getEntrevistaParticipantes, agregarFatoresEntrevista, calcularProgressoEntrevista, calcularMaturidadeEntrevista */
+const { useState, useEffect, useRef, useMemo } = React;
 
 // ════════════════════════════════════════════════════════════
-// ETAPAS DO CLIENTE — 7 etapas (redesign UX solicitado)
-// Cadastro (18 campos) • Proposta (preview + aceite) • Contrato • Sensibilização • Diagnóstico • Relatórios • Apresentação
+// ETAPAS DO CLIENTE — 8 etapas (com Entrevistas integrada na Etapa 6)
+// Cadastro • Proposta • Contrato • Sensibilização • Diagnóstico • Entrevistas • Relatórios • Apresentação
 // Seguindo boas práticas de UX: labels visíveis, agrupamento, progresso claro, cards, estados desabilitados, feedback
 // ════════════════════════════════════════════════════════════
 
@@ -56,11 +56,6 @@ const RoadmapScreen = ({ navigate, params = {} }) => {
     if (clienteId && !isNovoFlow && window.MenctorDB && typeof window.MenctorDB.getClient === "function") {
       window.MenctorDB.getClient(clienteId).then(full => {
         if (mounted && full) {
-          // Guardamos o registro do Supabase só em dbLoaded (usado abaixo para
-          // montar a tela do roadmap) — NÃO gravamos em window.CLIENTES, que é
-          // o mock usado pela Visão Geral. Esse registro real não tem os campos
-          // do dashboard (risk, healthScore, color...) e sobrescrevia/corrompia
-          // os clientes de demonstração, causando tela branca ao voltar pra lá.
           setDbLoaded(full);
           if (full.etapas) {
             if (!window.ETAPAS_CLIENTE) window.ETAPAS_CLIENTE = {};
@@ -72,12 +67,15 @@ const RoadmapScreen = ({ navigate, params = {} }) => {
     return () => { mounted = false; };
   }, [clienteId, isNovoFlow]);
 
+  const etapas = window.CLIENTE_ETAPAS || [];
+  const totalEtapas = etapas.length || 8;
+
   // Respeita ?etapa=1 da URL (usado ao clicar em cards para abrir direto no cadastro)
   const forcedEtapa = params.etapa ? parseInt(params.etapa, 10) : null;
 
   const [etapaSel, setEtapaSel] = useState(() => {
     if (isNovoFlow) return 1; // fluxo de novo cliente sempre começa no cadastro
-    if (forcedEtapa && forcedEtapa >= 1 && forcedEtapa <= 7) return forcedEtapa;
+    if (forcedEtapa && forcedEtapa >= 1 && forcedEtapa <= totalEtapas) return forcedEtapa;
     const saved = (window.ETAPAS_CLIENTE || {})[initialId];
     return (saved && saved.etapaAtual) || 1;
   });
@@ -105,10 +103,9 @@ const RoadmapScreen = ({ navigate, params = {} }) => {
     ? (novoDraft || dbLoaded)
     : (ativos.find(c => c.id === clienteId) || (window.CLIENTES || []).find(c => c.id === clienteId) || ativos[0]);
   const est = etapasState[clienteId] || (window.ETAPAS_ESTADO_INICIAL ? window.ETAPAS_ESTADO_INICIAL() : { etapaAtual: 1, status: {} });
-  const etapas = window.CLIENTE_ETAPAS || [];
 
   const currentEtapa = etapas.find(e => e.n === etapaSel) || etapas[0];
-  const pct = Math.round( (Object.values(est.status || {}).filter(s => s.status === "concluida" || s.aceito).length / 7) * 100 );
+  const pct = Math.round( (Object.values(est.status || {}).filter(s => s.status === "concluida" || s.aceito).length / totalEtapas) * 100 );
 
   // Esconde seletor de cliente:
   // - no fluxo "Novo cliente" (enquanto ainda é draft, antes de salvar)
@@ -128,7 +125,6 @@ const RoadmapScreen = ({ navigate, params = {} }) => {
       cnpj: patch.cnpj || novoDraft.cnpj || "",
       contact: patch.responsavel || patch.contatoNome || novoDraft.contact || "",
       sector: patch.segmento || novoDraft.sector || "Serviços",
-      // podemos enriquecer mais campos se necessário
     };
 
     if (!window.CLIENTES) window.CLIENTES = [];
@@ -155,7 +151,7 @@ const RoadmapScreen = ({ navigate, params = {} }) => {
       if (!next[clienteId]) next[clienteId] = { etapaAtual: 1, status: {} };
       next[clienteId].status[n] = { ...(next[clienteId].status[n] || {}), ...patch };
       // Avança automático quando marca como concluído
-      if ((patch.status === "concluida" || patch.aceito === true) && (next[clienteId].etapaAtual || 1) === n && n < 7) {
+      if ((patch.status === "concluida" || patch.aceito === true) && (next[clienteId].etapaAtual || 1) === n && n < totalEtapas) {
         next[clienteId].etapaAtual = n + 1;
       }
       return next;
@@ -294,13 +290,15 @@ const RoadmapScreen = ({ navigate, params = {} }) => {
         )}
       </div>
 
-      {/* STEPPER 7 ETAPAS — UX clara */}
+      {/* STEPPER 8 ETAPAS — UX clara */}
       <div style={{ display: "flex", gap: 6, marginBottom: 18, overflowX: "auto", paddingBottom: 6 }}>
         {etapas.map((et, idx) => {
           const s = est.status[et.n] || {};
           const isDone = s.status === "concluida" || s.aceito === true;
           const isActive = et.n === etapaSel;
           const isCurrent = et.n === (est.etapaAtual || 1);
+          const isEntrevistaBloqueada = et.n === 6 && !((est.status[5]?.instrumentos || []).includes("entrevista"));
+
           return (
             <button
               key={et.n}
@@ -308,7 +306,8 @@ const RoadmapScreen = ({ navigate, params = {} }) => {
               style={{
                 flex: 1, minWidth: 108, padding: "10px 12px", borderRadius: 10,
                 border: isActive ? "2px solid var(--health)" : "1px solid var(--line)",
-                background: isActive ? "var(--surface-sage)" : "var(--surface)",
+                background: isActive ? "var(--surface-sage)" : isEntrevistaBloqueada ? "var(--canvas-warm)" : "var(--surface)",
+                opacity: isEntrevistaBloqueada && !isActive ? 0.78 : 1,
                 textAlign: "left", display: "flex", flexDirection: "column", gap: 2,
                 cursor: "pointer", transition: "all .15s"
               }}>
@@ -316,14 +315,18 @@ const RoadmapScreen = ({ navigate, params = {} }) => {
                 <div style={{
                   width: 18, height: 18, borderRadius: 999, fontSize: 10, fontWeight: 700,
                   display: "inline-flex", alignItems: "center", justifyContent: "center",
-                  background: isDone ? "var(--health)" : isActive || isCurrent ? "var(--ink)" : "var(--canvas-warm)",
-                  color: isDone || isActive || isCurrent ? "#fff" : "var(--ink-muted)",
+                  background: isEntrevistaBloqueada ? "#94A3B8" : isDone ? "var(--health)" : isActive || isCurrent ? "var(--ink)" : "var(--canvas-warm)",
+                  color: isEntrevistaBloqueada || isDone || isActive || isCurrent ? "#fff" : "var(--ink-muted)",
                 }}>
-                  {isDone ? <Icon name="check" size={10} color="#fff" /> : et.n}
+                  {isEntrevistaBloqueada ? "🔒" : isDone ? <Icon name="check" size={10} color="#fff" /> : et.n}
                 </div>
                 <span style={{ fontSize: 12.5, fontWeight: isActive ? 700 : 600, color: "var(--ink)" }}>{et.label}</span>
               </div>
-              {isCurrent && !isDone && <span style={{ fontSize: 10, color: "var(--health-deep)" }}>Atual</span>}
+              {isEntrevistaBloqueada ? (
+                <span style={{ fontSize: 10, color: "#94A3B8" }}>Bloqueada</span>
+              ) : isCurrent && !isDone ? (
+                <span style={{ fontSize: 10, color: "var(--health-deep)" }}>Atual</span>
+              ) : null}
             </button>
           );
         })}
@@ -349,7 +352,7 @@ const RoadmapScreen = ({ navigate, params = {} }) => {
           gap: 12
         }}>
           <div>
-            <div className="eyebrow">Etapa {currentEtapa.n} de 7</div>
+            <div className="eyebrow">Etapa {currentEtapa.n} de {totalEtapas}</div>
             <h2 style={{ margin: "4px 0 0", fontSize: 22, fontWeight: 700 }}>{currentEtapa.label}</h2>
             <p style={{ margin: "6px 0 0", color: "var(--ink-muted)", fontSize: 14 }}>{currentEtapa.desc}</p>
           </div>
@@ -411,31 +414,52 @@ const RoadmapScreen = ({ navigate, params = {} }) => {
             />
           )}
 
-          {/* 5. DIAGNÓSTICO — Selecionar COPSOQII, DRPS e clima organizacional */}
+          {/* 5. DIAGNÓSTICO — Selecionar COPSOQ II, HSE, Entrevista, DRPS e Clima */}
           {etapaSel === 5 && (
             <DiagnosticoEtapa
               data={est.status[5] || {}}
               onUpdate={(patch) => updEtapa(5, patch)}
-              onNext={() => setEtapaAtual(6)}
+              onNext={(target) => {
+                const hasEnt = (est.status[5]?.instrumentos || []).includes("entrevista");
+                setEtapaAtual(target || (hasEnt ? 6 : 7));
+              }}
             />
           )}
 
-          {/* 6. RELATÓRIOS — liberada automaticamente quando o Diagnóstico (etapa 5) é concluído */}
+          {/* 6. ENTREVISTAS — Roteiro qualitativo de 12 fatores por IA e avaliação de maturidade NR-1 */}
           {etapaSel === 6 && (
-            <RelatoriosEtapa
+            <EntrevistasEtapa
               cliente={cliente}
               diagnosticoData={est.status[5] || {}}
               data={est.status[6] || {}}
               onUpdate={(patch) => updEtapa(6, patch)}
               onNext={() => setEtapaAtual(7)}
+              onHabilitarEntrevista={() => {
+                const curr = est.status[5]?.instrumentos || [];
+                if (!curr.includes("entrevista")) {
+                  updEtapa(5, { instrumentos: [...curr, "entrevista"], status: "concluida" });
+                }
+              }}
             />
           )}
 
-          {/* 7. APRESENTAÇÃO — Reunião para discussão do plano de ação */}
+          {/* 7. RELATÓRIOS — liberada automaticamente quando o Diagnóstico e Entrevistas são concluídos */}
           {etapaSel === 7 && (
-            <ApresentacaoEtapa
+            <RelatoriosEtapa
+              cliente={cliente}
+              diagnosticoData={est.status[5] || {}}
+              entrevistasData={est.status[6] || {}}
               data={est.status[7] || {}}
               onUpdate={(patch) => updEtapa(7, patch)}
+              onNext={() => setEtapaAtual(8)}
+            />
+          )}
+
+          {/* 8. APRESENTAÇÃO — Reunião para discussão do plano de ação */}
+          {etapaSel === 8 && (
+            <ApresentacaoEtapa
+              data={est.status[8] || {}}
+              onUpdate={(patch) => updEtapa(8, patch)}
             />
           )}
         </div>
@@ -2147,14 +2171,1001 @@ const DiagnosticoEtapa = ({ data, onUpdate, onNext }) => {
         ))}
       </div>
 
-      <button style={{ marginTop: 16 }} onClick={onNext} className="btn btn-accent" disabled={!inst.length} title={!inst.length ? "Adicione ao menos um instrumento" : undefined}>
-        Avançar (Relatórios desabilitados)
-      </button>
+      {(() => {
+        const temEntrevista = inst.includes("entrevista");
+        return (
+          <button
+            style={{ marginTop: 16 }}
+            onClick={() => onNext(temEntrevista ? 6 : 7)}
+            className="btn btn-accent"
+            disabled={!inst.length}
+            title={!inst.length ? "Adicione ao menos um instrumento" : undefined}
+          >
+            {temEntrevista ? "Avançar para Entrevistas (Etapa 6) →" : "Avançar para Relatórios (Etapa 7) →"}
+          </button>
+        );
+      })()}
     </div>
   );
 };
 
-// 6. RELATÓRIOS — liberada automaticamente quando o Diagnóstico (etapa 5) é concluído
+// ════════════════════════════════════════════════════════════
+// 6. ENTREVISTAS — Roteiro de 12 fatores por IA e avaliação de maturidade NR-1
+// Bloqueada se "entrevista" não for selecionada no Diagnóstico; Liberada com todas as funções quando selecionada.
+// ════════════════════════════════════════════════════════════
+
+// Tira de calor dos 12 fatores, agrupada nas 3 estruturas do roteiro —
+// cada barra mostra a severidade já registrada (ou vazio, se pendente).
+const EntrevistaFatorStrip = ({ agregados = {} }) => (
+  <div style={{ display: "flex", gap: 10 }}>
+    {ENTREVISTA_ESTRUTURAS.map(estr => {
+      const fatoresEstr = ENTREVISTA_FATORES.filter(f => f.estruturaId === estr.id);
+      return (
+        <div key={estr.id} style={{ display: "flex", gap: 3 }} title={estr.short}>
+          {fatoresEstr.map(f => {
+            const ag = agregados[f.id];
+            const cor = ag ? CLASSIFICACAO_CORES[ag.classificacaoArredondada] : "var(--border-strong)";
+            return <span key={f.id} style={{ width: 6, height: 14, borderRadius: 2, background: cor, opacity: ag ? 1 : 0.5 }} />;
+          })}
+        </div>
+      );
+    })}
+  </div>
+);
+
+const EntrevistasEtapa = ({ cliente, diagnosticoData, data, onUpdate, onNext, onHabilitarEntrevista }) => {
+  const instrumentos = diagnosticoData?.instrumentos || [];
+  const isHabilitado = instrumentos.includes("entrevista");
+
+  // Estado das entrevistas (salvo localmente ou inicializado a partir do mock)
+  const [entrevistasList, setEntrevistasList] = useState(() => {
+    try {
+      const saved = localStorage.getItem("MENCTOR_ENTREVISTAS");
+      if (saved) {
+        const list = JSON.parse(saved);
+        const cliEntrevistas = list.filter(e => e.clienteId === cliente.id);
+        if (cliEntrevistas.length > 0) return list;
+      }
+    } catch (e) { /* ignore */ }
+    
+    // Se já existem no mock para este cliente
+    const mockList = (window.ENTREVISTAS_MOCK || []).filter(e => e.clienteId === cliente.id);
+    if (mockList.length > 0) return window.ENTREVISTAS_MOCK || [];
+
+    // Fallback: cria uma entrevista inicial padrão para este cliente
+    const fallbackEntrevista = {
+      id: `ent-${cliente.id}-1`,
+      clienteId: cliente.id,
+      titulo: `Entrevista Diagnóstica NR-1 — ${cliente.name}`,
+      entrevistador: "Caio Guedes",
+      data: new Date().toISOString().split("T")[0],
+      status: "rascunho",
+      fatoresAvaliados: {},
+      atualizadoEm: `${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`
+    };
+    const initialList = [...(window.ENTREVISTAS_MOCK || []), fallbackEntrevista];
+    try {
+      localStorage.setItem("MENCTOR_ENTREVISTAS", JSON.stringify(initialList));
+    } catch (e) { /* ignore */ }
+    return initialList;
+  });
+
+  const [selectedEntrevistaId, setSelectedEntrevistaId] = useState(null);
+  const [activeTab, setActiveTab] = useState("fator-assedio"); // "fator-<id>" ou "resultado"
+  const [activeParticipanteId, setActiveParticipanteId] = useState(null);
+  const [modalNovo, setModalNovo] = useState(false);
+  const [novoTitulo, setNovoTitulo] = useState(`Entrevista de Avaliação Psicossocial — ${cliente.name}`);
+  const [novoEntrevistador, setNovoEntrevistador] = useState("Caio Guedes");
+  const [novoCargo, setNovoCargo] = useState("Lideranças & Gestão");
+  const [novoQtdPessoas, setNovoQtdPessoas] = useState(1);
+  const [novaEvidenciaInput, setNovaEvidenciaInput] = useState("");
+
+  const saveEntrevistas = (updated) => {
+    setEntrevistasList(updated);
+    try {
+      localStorage.setItem("MENCTOR_ENTREVISTAS", JSON.stringify(updated));
+    } catch (e) { /* ignore */ }
+  };
+
+  const clientEntrevistas = useMemo(() => {
+    return entrevistasList.filter(e => e.clienteId === cliente.id);
+  }, [entrevistasList, cliente.id]);
+
+  const selectedEntrevista = useMemo(() => {
+    if (!selectedEntrevistaId) return null;
+    return entrevistasList.find(e => e.id === selectedEntrevistaId) || clientEntrevistas[0] || null;
+  }, [selectedEntrevistaId, entrevistasList, clientEntrevistas]);
+
+  const participantes = useMemo(() => selectedEntrevista ? getEntrevistaParticipantes(selectedEntrevista) : [], [selectedEntrevista]);
+  const activeParticipante = participantes.find(p => p.id === activeParticipanteId) || participantes[0];
+  const fatoresAvaliados = activeParticipante?.fatoresAvaliados || {};
+
+  // Atualizar fator da pessoa ativa, dentro da entrevista aberta
+  const updateFator = (fatorId, partial) => {
+    if (!selectedEntrevista || !activeParticipante) return;
+    const current = fatoresAvaliados[fatorId] || { classificacao: null, observacoes: "", respostas: {}, evidencias: [] };
+    const updatedParticipantes = participantes.map(p => p.id !== activeParticipante.id ? p : {
+      ...p,
+      fatoresAvaliados: { ...p.fatoresAvaliados, [fatorId]: { ...current, ...partial } }
+    });
+
+    const progresso = calcularProgressoEntrevista({ participantes: updatedParticipantes });
+    const nextStatus = progresso.totalRespondido === 0 ? "rascunho"
+      : progresso.participantesConcluidos === progresso.totalParticipantes ? "concluida"
+      : "em_andamento";
+
+    const updatedEntrevista = {
+      ...selectedEntrevista,
+      status: nextStatus,
+      participantes: updatedParticipantes,
+      atualizadoEm: `${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`
+    };
+    delete updatedEntrevista.fatoresAvaliados;
+
+    const nextList = entrevistasList.map(e => e.id === updatedEntrevista.id ? updatedEntrevista : e);
+    saveEntrevistas(nextList);
+
+    // Notificar roadmap
+    onUpdate({
+      status: nextStatus,
+      fatoresRespondidos: progresso.totalRespondido,
+      totalEntrevistas: clientEntrevistas.length
+    });
+  };
+
+  const handleCriarEntrevista = (e) => {
+    e.preventDefault();
+    const nova = {
+      id: `ent-${cliente.id}-${Date.now()}`,
+      clienteId: cliente.id,
+      titulo: novoTitulo || `Entrevista Psicossocial — ${cliente.name}`,
+      entrevistador: novoEntrevistador || "Caio Guedes",
+      cargo: novoCargo,
+      qtdPessoas: novoQtdPessoas,
+      data: new Date().toISOString().split("T")[0],
+      status: "rascunho",
+      participantes: criarParticipantesEntrevista(novoQtdPessoas),
+      atualizadoEm: `${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`
+    };
+    const nextList = [nova, ...entrevistasList];
+    saveEntrevistas(nextList);
+    setModalNovo(false);
+    setSelectedEntrevistaId(nova.id);
+    setActiveParticipanteId(nova.participantes[0].id);
+    setActiveTab("fator-assedio");
+  };
+
+  const handleExcluirEntrevista = (id, e) => {
+    e.stopPropagation();
+    if (confirm("Deseja realmente remover esta entrevista?")) {
+      const nextList = entrevistasList.filter(item => item.id !== id);
+      saveEntrevistas(nextList);
+      if (selectedEntrevistaId === id) setSelectedEntrevistaId(null);
+    }
+  };
+
+  // Cálculo de maturidade CERTIFICA NR-1 — média das respostas de todas as pessoas por fator
+  const resultadoMaturidade = useMemo(() => {
+    if (!selectedEntrevista) return null;
+    return calcularMaturidadeEntrevista(selectedEntrevista);
+  }, [selectedEntrevista]);
+
+  const agregadosFatores = useMemo(() => {
+    if (!selectedEntrevista) return {};
+    return agregarFatoresEntrevista(selectedEntrevista);
+  }, [selectedEntrevista]);
+
+  const progressoEntrevista = useMemo(() => {
+    if (!selectedEntrevista) return null;
+    return calcularProgressoEntrevista(selectedEntrevista);
+  }, [selectedEntrevista]);
+
+  // ════════════════════════════════════════════════════════════
+  // ESTADO 1: ETAPA BLOQUEADA (Instrumento não selecionado na Etapa 5)
+  // ════════════════════════════════════════════════════════════
+  if (!isHabilitado) {
+    return (
+      <div style={{ padding: "8px 0" }}>
+        {/* Banner Bloqueado */}
+        <div style={{
+          background: "linear-gradient(135deg, var(--canvas-warm) 0%, var(--accent-soft) 100%)",
+          borderRadius: 16,
+          padding: "36px 36px",
+          border: "1.5px dashed var(--accent-light)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 28,
+          flexWrap: "wrap"
+        }}>
+          <div style={{ maxWidth: 620 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--accent-cta)", background: "var(--accent-soft)", padding: "4px 10px", borderRadius: 99, marginBottom: 12 }}>
+              <Icon name="lock" size={11} color="var(--accent-cta)" /> Etapa 6 · instrumento bloqueado
+            </div>
+            <h3 style={{ fontSize: 24, fontWeight: 800, color: "var(--ink)", margin: "0 0 8px", letterSpacing: "-0.02em" }}>
+              Entrevistas de riscos psicossociais (NR-1)
+            </h3>
+            <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.6, margin: 0 }}>
+              Esta etapa está desabilitada porque o instrumento <strong>"Entrevista (Sugerida por IA)"</strong> não está selecionado na <strong>Etapa 5 — Diagnóstico</strong> para a empresa <strong>{cliente.name}</strong>.
+            </p>
+            <p style={{ fontSize: 13, color: "var(--ink-muted)", marginTop: 8, lineHeight: 1.5 }}>
+              A entrevista qualitativa permite investigar a fundo os 12 fatores psicossociais através de roteiros gerados por IA e classificar a maturidade institucional conforme as diretrizes da NR-1.
+            </p>
+
+            <div style={{ display: "flex", gap: 12, marginTop: 22, flexWrap: "wrap" }}>
+              <button onClick={onHabilitarEntrevista} className="btn btn-accent" style={{ height: 44, fontSize: 13.5 }}>
+                Habilitar entrevista no diagnóstico e liberar agora <Icon name="arrow-right" size={14} />
+              </button>
+
+              <button onClick={onNext} className="btn btn-ghost" style={{ height: 44, padding: "0 18px", fontSize: 13, border: "1px solid var(--line)", background: "var(--surface)" }}>
+                Pular para Relatórios (Etapa 7) →
+              </button>
+            </div>
+          </div>
+
+          {/* Card Ilustrativo de Benefícios */}
+          <div style={{
+            background: "var(--surface)",
+            border: "1px solid var(--accent-light)",
+            borderRadius: 14,
+            padding: "20px 22px",
+            minWidth: 260,
+          }}>
+            <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: "var(--accent-cta)", letterSpacing: "0.06em", marginBottom: 8 }}>
+              O que é incluído
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 12.5, color: "var(--ink-soft)" }}>
+              {[
+                "12 fatores em 3 estruturas NR-1",
+                "Perguntas de sondagem por IA",
+                "Classificação de risco (1 a 5)",
+                "Cálculo de nível de maturidade",
+                "Integração direta aos relatórios",
+              ].map(item => (
+                <div key={item} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <Icon name="check" size={13} color="var(--accent-cta)" /> {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ════════════════════════════════════════════════════════════
+  // ESTADO 2: ETAPA LIBERADA — AVALIAÇÃO DETALHADA DA ENTREVISTA SELECIONADA
+  // ════════════════════════════════════════════════════════════
+  if (selectedEntrevista) {
+    const fatores = window.ENTREVISTA_FATORES || [];
+    const estruturas = window.ENTREVISTA_ESTRUTURAS || [];
+    const progressoPct = progressoEntrevista?.pct || 0;
+
+    const activeFactor = activeTab !== "resultado"
+      ? (fatores.find(f => `fator-${f.id}` === activeTab) || fatores[0])
+      : null;
+
+    const activeFactorData = activeFactor
+      ? (fatoresAvaliados[activeFactor.id] || { classificacao: null, observacoes: "", respostas: {}, evidencias: [] })
+      : null;
+
+    const CLASSIFICACAO_DESCRICOES = {
+      1: "Ambiente favorável, políticas claras e ausência de risco significativo.",
+      2: "Episódios pontuais e isolados, sem impacto sistêmico relevante.",
+      3: "Frequência moderada de desconforto ou sobrecarga perceptível.",
+      4: "Impacto recorrente na saúde e clima; exige ação corretiva no PGR.",
+      5: "Gravidade máxima com dano potencial imediato à saúde mental.",
+    };
+    const classificacoes = [1, 2, 3, 4, 5].map(v => ({
+      v,
+      label: `Nível ${v} • ${CLASSIFICACAO_LABELS[v]}`,
+      desc: CLASSIFICACAO_DESCRICOES[v],
+      cor: CLASSIFICACAO_CORES[v],
+      bg: `${CLASSIFICACAO_CORES[v]}1f`,
+    }));
+
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+        {/* Top bar da entrevista */}
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "14px 18px",
+          background: "var(--canvas-warm)",
+          borderRadius: 12,
+          border: "1px solid var(--line)",
+          flexWrap: "wrap",
+          gap: 12
+        }}>
+          <button
+            onClick={() => setSelectedEntrevistaId(null)}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              fontSize: 13,
+              fontWeight: 600,
+              color: "var(--ink)",
+              background: "#fff",
+              border: "1px solid var(--line)",
+              padding: "6px 14px",
+              borderRadius: 8,
+              cursor: "pointer"
+            }}
+          >
+            <Icon name="arrow-left" size={13} /> Ver todas as entrevistas de {cliente.name}
+          </button>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 12.5, color: "var(--ink-muted)" }}>
+                Progresso: <strong>{progressoEntrevista.participantesConcluidos}/{progressoEntrevista.totalParticipantes} pessoas</strong> ({progressoPct}%)
+              </span>
+              <div style={{ width: 100, height: 8, borderRadius: 99, background: "var(--line)", overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${progressoPct}%`, background: progressoPct === 100 ? "var(--health)" : "var(--accent)" }} />
+              </div>
+            </div>
+
+            <button
+              onClick={() => setActiveTab(activeTab === "resultado" ? "fator-assedio" : "resultado")}
+              className="btn"
+              style={{
+                height: 34,
+                fontSize: 12.5,
+                background: activeTab === "resultado" ? "var(--health-deep)" : "var(--surface)",
+                color: activeTab === "resultado" ? "#fff" : "var(--ink)",
+                border: "1px solid var(--line)"
+              }}
+            >
+              <Icon name="activity" size={13} /> {activeTab === "resultado" ? "Voltar ao Roteiro" : "Ver Resultado & Maturidade"}
+            </button>
+          </div>
+        </div>
+
+        {/* Título e Metadados da Entrevista */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--accent-cta)" }}>
+              AVALIAÇÃO EM ANDAMENTO • {cliente.name}
+            </div>
+            <h3 style={{ fontSize: 20, fontWeight: 700, margin: "4px 0 2px", color: "var(--ink)" }}>{selectedEntrevista.titulo}</h3>
+            <div style={{ fontSize: 12.5, color: "var(--ink-muted)", display: "flex", gap: 14 }}>
+              <span>Entrevistador: <strong>{selectedEntrevista.entrevistador}</strong></span>
+              {selectedEntrevista.cargo && <span>Grupo/Cargo: <strong>{selectedEntrevista.cargo}</strong></span>}
+              {selectedEntrevista.qtdPessoas && <span>Pessoas: <strong>{selectedEntrevista.qtdPessoas}</strong></span>}
+              <span>Data: <strong>{selectedEntrevista.data}</strong></span>
+            </div>
+          </div>
+
+          <span style={{
+            padding: "4px 12px",
+            borderRadius: 99,
+            fontSize: 11.5,
+            fontWeight: 700,
+            background: selectedEntrevista.status === "concluida" ? "var(--health-soft)" : "var(--amber-soft)",
+            color: selectedEntrevista.status === "concluida" ? "var(--health-deep)" : "var(--amber)",
+            border: `1px solid ${selectedEntrevista.status === "concluida" ? "var(--health)" : "var(--amber)"}`
+          }}>
+            {selectedEntrevista.status === "concluida" ? "✓ Concluída" : selectedEntrevista.status === "em_andamento" ? "Em andamento" : "Rascunho"}
+          </span>
+        </div>
+
+        {/* Seletor de participante — a quem as respostas do roteiro pertencem */}
+        {participantes.length > 1 && activeTab !== "resultado" && (
+          <div className="card" style={{ padding: "12px 14px", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 11.5, fontWeight: 700, color: "var(--ink-faint)", textTransform: "uppercase", letterSpacing: "0.06em", flexShrink: 0 }}>
+              Respondendo por
+            </span>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {participantes.map(p => {
+                const count = Object.values(p.fatoresAvaliados || {}).filter(f => f?.classificacao).length;
+                const done = count === fatores.length;
+                const isActive = p.id === activeParticipante.id;
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => setActiveParticipanteId(p.id)}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 6,
+                      padding: "6px 12px", borderRadius: 999,
+                      background: isActive ? "var(--accent-soft)" : "var(--surface-2)",
+                      border: isActive ? "1px solid var(--accent-light)" : "1px solid var(--border)",
+                      color: isActive ? "var(--accent-cta)" : "var(--ink-soft)",
+                      fontSize: 12.5, fontWeight: isActive ? 700 : 500, cursor: "pointer"
+                    }}
+                  >
+                    {p.nome}
+                    <span style={{
+                      fontSize: 10.5, fontWeight: 700, padding: "1px 6px", borderRadius: 999,
+                      background: done ? "var(--health-soft)" : "var(--surface)",
+                      color: done ? "var(--health-deep)" : "var(--ink-muted)",
+                    }}>
+                      {count}/{fatores.length}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ABA: RESULTADO & MATURIDADE */}
+        {activeTab === "resultado" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+            {resultadoMaturidade ? (
+              <>
+                {/* Hero do Nível de Maturidade */}
+                <div style={{
+                  background: "linear-gradient(135deg, var(--canvas-warm) 0%, var(--accent-soft) 100%)",
+                  border: "1.5px solid var(--accent-light)",
+                  borderRadius: 14,
+                  padding: "24px 28px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 20,
+                  flexWrap: "wrap"
+                }}>
+                  <div style={{ maxWidth: 580 }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--accent-cta)", marginBottom: 4 }}>
+                      Diagnóstico consolidado de maturidade psicossocial
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "6px 0" }}>
+                      <span style={{
+                        padding: "6px 14px",
+                        borderRadius: 99,
+                        fontSize: 14,
+                        fontWeight: 800,
+                        background: resultadoMaturidade.nivel?.cor || "var(--accent-cta)",
+                        color: "#fff"
+                      }}>
+                        Nível {resultadoMaturidade.nivel?.nivel}: {resultadoMaturidade.nivel?.label}
+                      </span>
+                      <span style={{ fontSize: 18, fontWeight: 800, color: "var(--ink)" }}>
+                        Média geral: {resultadoMaturidade.media} / 5.0
+                      </span>
+                    </div>
+                    <p style={{ margin: "10px 0 0", fontSize: 13.5, color: "var(--ink-soft)", lineHeight: 1.55 }}>
+                      {resultadoMaturidade.nivel?.descricao}
+                    </p>
+                  </div>
+
+                  <div style={{ background: "var(--surface)", border: "1px solid var(--accent-light)", borderRadius: 12, padding: "14px 20px", textAlign: "center", minWidth: 160 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--ink-muted)" }}>Fatores Avaliados</div>
+                    <div style={{ fontSize: 26, fontWeight: 800, color: "var(--ink)", margin: "4px 0" }}>
+                      {resultadoMaturidade.totalAvaliados}/12
+                    </div>
+                    <div style={{ fontSize: 11.5, color: resultadoMaturidade.fatoresCriticos.length ? "var(--coral)" : "var(--health-deep)", fontWeight: 600 }}>
+                      {resultadoMaturidade.fatoresCriticos.length ? `${resultadoMaturidade.fatoresCriticos.length} crítico(s)` : "Nenhum crítico"}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Médias por Estrutura */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+                  <div className="card" style={{ padding: "16px 18px", border: "1px solid var(--line)" }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase" }}>1. Estrutura das Relações</div>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: "var(--ink)", margin: "4px 0" }}>
+                      {resultadoMaturidade.mediasPorEstrutura.relacoes} <span style={{ fontSize: 12, color: "var(--ink-muted)" }}>/5.0</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>Assédio, liderança abusiva, discriminação e conflitos.</div>
+                  </div>
+
+                  <div className="card" style={{ padding: "16px 18px", border: "1px solid var(--line)" }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase" }}>2. Estrutura das Atividades</div>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: "var(--ink)", margin: "4px 0" }}>
+                      {resultadoMaturidade.mediasPorEstrutura.atividades} <span style={{ fontSize: 12, color: "var(--ink-muted)" }}>/5.0</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>Sobrecarga, ritmo, autonomia e monotonia.</div>
+                  </div>
+
+                  <div className="card" style={{ padding: "16px 18px", border: "1px solid var(--line)" }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase" }}>3. Estrutura Organizacional</div>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: "var(--ink)", margin: "4px 0" }}>
+                      {resultadoMaturidade.mediasPorEstrutura.organizacional} <span style={{ fontSize: 12, color: "var(--ink-muted)" }}>/5.0</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>Insegurança, reconhecimento, suporte e equilíbrio vida-trabalho.</div>
+                  </div>
+                </div>
+
+                {/* Fatores Críticos identificados */}
+                {resultadoMaturidade.fatoresCriticos.length > 0 && (
+                  <div style={{ background: "var(--coral-soft)", border: "1px solid var(--coral)", borderRadius: 12, padding: "16px 20px" }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--coral)", marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
+                      <span>⚠️</span> FATORES DE ATENÇÃO CRÍTICA IDENTIFICADOS (Nível 4 ou 5)
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      {resultadoMaturidade.fatoresCriticos.map((fc, i) => {
+                        const criticos = fc.respostas.filter(r => r.classificacao >= 4);
+                        return (
+                          <div key={i} style={{ fontSize: 13, color: "var(--ink)" }}>
+                            • <strong>{fc.fator?.nome || "Fator"}</strong>: média {fc.media.toFixed(1)}/5 — {criticos.length} de {fc.totalRespostas} pessoa{fc.totalRespostas === 1 ? "" : "s"} {criticos.length === 1 ? "classificou" : "classificaram"} como Alto ou Muito Alto. Requer plano de intervenção prioritário.
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div style={{ textAlign: "center", padding: "40px 20px", color: "var(--ink-muted)" }}>
+                <p>Nenhum fator classificado ainda nesta entrevista.</p>
+                <button onClick={() => setActiveTab("fator-assedio")} className="btn btn-primary" style={{ height: 38, marginTop: 8 }}>
+                  Iniciar Avaliação pelo Roteiro
+                </button>
+              </div>
+            )}
+
+            {/* Ações de conclusão */}
+            <div style={{ display: "flex", gap: 12, justifyContent: "flex-end", marginTop: 8 }}>
+              <button onClick={() => setActiveTab("fator-assedio")} className="btn btn-ghost" style={{ border: "1px solid var(--line)" }}>
+                Voltar aos Fatores
+              </button>
+              <button
+                onClick={() => {
+                  onUpdate({ status: "concluida" });
+                  onNext();
+                }}
+                className="btn btn-accent"
+              >
+                Concluir Etapa 6 e Avançar para Relatórios (Etapa 7) →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ABA: ROTEIRO DE 12 FATORES POR ESTRUTURAS */}
+        {activeTab !== "resultado" && activeFactor && (
+          <div style={{ display: "grid", gridTemplateColumns: "310px 1fr", gap: 18, alignItems: "start" }}>
+            {/* Navegação lateral por fatores */}
+            <div className="card" style={{ padding: 12, display: "flex", flexDirection: "column", gap: 10, maxHeight: 680, overflowY: "auto" }}>
+              {estruturas.map(est => {
+                const fatoresEstrutura = fatores.filter(f => f.estruturaId === est.id);
+                return (
+                  <div key={est.id}>
+                    <div style={{ fontSize: 10.5, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ink-muted)", padding: "4px 8px" }}>
+                      {est.nome}
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                      {fatoresEstrutura.map(f => {
+                        const tabKey = `fator-${f.id}`;
+                        const isSel = activeTab === tabKey;
+                        const dataF = fatoresAvaliados[f.id];
+                        const classif = dataF?.classificacao;
+                        const classifObj = classif ? classificacoes.find(c => c.v === classif) : null;
+
+                        return (
+                          <button
+                            key={f.id}
+                            onClick={() => setActiveTab(tabKey)}
+                            style={{
+                              textAlign: "left",
+                              padding: "8px 10px",
+                              borderRadius: 8,
+                              background: isSel ? "var(--surface-sage)" : "transparent",
+                              border: isSel ? "1.5px solid var(--health)" : "1px solid transparent",
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              gap: 8,
+                              cursor: "pointer"
+                            }}
+                          >
+                            <span style={{ fontSize: 12.5, fontWeight: isSel ? 700 : 500, color: "var(--ink)", flex: 1, lineHeight: 1.2 }}>
+                              {f.nome}
+                            </span>
+                            {classifObj ? (
+                              <span style={{ fontSize: 10.5, fontWeight: 800, padding: "2px 7px", borderRadius: 99, background: classifObj.bg, color: classifObj.cor, flexShrink: 0 }}>
+                                Nível {classif}
+                              </span>
+                            ) : (
+                              <span style={{ fontSize: 10, color: "var(--ink-muted)", flexShrink: 0 }}>• Pendente</span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Painel Central do Fator Selecionado */}
+            <div className="card" style={{ padding: 22, display: "flex", flexDirection: "column", gap: 18 }}>
+              {/* Header do Fator */}
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                  <span className="pill pill-brand">
+                    {estruturas.find(e => e.id === activeFactor.estruturaId)?.nome}
+                  </span>
+                  <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>Fator {fatores.findIndex(f => f.id === activeFactor.id) + 1} de 12</span>
+                </div>
+                <h3 style={{ fontSize: 20, fontWeight: 700, margin: "2px 0 6px", color: "var(--ink)" }}>{activeFactor.nome}</h3>
+                <p style={{ margin: 0, fontSize: 13.5, color: "var(--ink-muted)", lineHeight: 1.5 }}>
+                  {activeFactor.objetivo}
+                </p>
+              </div>
+
+              {/* Card de Perguntas Orientadoras por IA */}
+              <div style={{ background: "var(--accent-soft)", border: "1px solid var(--accent-light)", borderRadius: 12, padding: "16px 18px" }}>
+                <div style={{ fontSize: 11.5, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--accent-cta)", marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
+                  <Icon name="sparkles" size={13} color="var(--accent-cta)" /> Roteiro orientador de perguntas (sugerido por IA)
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 13, color: "var(--ink-soft)", lineHeight: 1.45 }}>
+                  {activeFactor.perguntas?.map((p, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                      <span style={{ color: "var(--accent-cta)", fontWeight: 700 }}>•</span>
+                      <span>{p}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Seletor de Classificação de Risco (1 a 5) */}
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)", marginBottom: 8 }}>
+                  Classificação de Risco / Maturidade do Fator (NR-1):
+                </div>
+                <div style={{ display: "grid", gap: 8 }}>
+                  {classificacoes.map(c => {
+                    const isChecked = activeFactorData?.classificacao === c.v;
+                    return (
+                      <div
+                        key={c.v}
+                        onClick={() => updateFator(activeFactor.id, { classificacao: c.v })}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 12,
+                          padding: "10px 14px",
+                          borderRadius: 10,
+                          border: isChecked ? `2px solid ${c.cor}` : "1px solid var(--line)",
+                          background: isChecked ? c.bg : "var(--surface)",
+                          cursor: "pointer",
+                          transition: "all .15s"
+                        }}
+                      >
+                        <div style={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: 99,
+                          border: isChecked ? `6px solid ${c.cor}` : "2px solid var(--line)",
+                          background: "#fff",
+                          flexShrink: 0
+                        }} />
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 13.5, fontWeight: 700, color: isChecked ? c.cor : "var(--ink)" }}>{c.label}</div>
+                          <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 1 }}>{c.desc}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Observações e Parecer Técnico do Consultor */}
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)", marginBottom: 6 }}>
+                  Observações & Parecer do Consultor:
+                </div>
+                <textarea
+                  rows={3}
+                  value={activeFactorData?.observacoes || ""}
+                  onChange={e => updateFator(activeFactor.id, { observacoes: e.target.value })}
+                  placeholder="Registre relatos, percepções, dinâmicas de poder observadas ou contexto relevante..."
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    borderRadius: 8,
+                    border: "1px solid var(--line)",
+                    fontSize: 13,
+                    background: "var(--surface)",
+                    color: "var(--ink)",
+                    boxSizing: "border-box"
+                  }}
+                />
+              </div>
+
+              {/* Navegação entre fatores */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 12, borderTop: "1px solid var(--line)" }}>
+                {(() => {
+                  const currIdx = fatores.findIndex(f => f.id === activeFactor.id);
+                  const prevF = currIdx > 0 ? fatores[currIdx - 1] : null;
+                  const nextF = currIdx < fatores.length - 1 ? fatores[currIdx + 1] : null;
+
+                  return (
+                    <>
+                      {prevF ? (
+                        <button
+                          onClick={() => setActiveTab(`fator-${prevF.id}`)}
+                          className="btn btn-ghost"
+                          style={{ fontSize: 12.5, border: "1px solid var(--line)" }}
+                        >
+                          ← {prevF.nome}
+                        </button>
+                      ) : <div />}
+
+                      {nextF ? (
+                        <button
+                          onClick={() => setActiveTab(`fator-${nextF.id}`)}
+                          className="btn btn-primary"
+                          style={{ fontSize: 12.5 }}
+                        >
+                          Próximo: {nextF.nome} →
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => setActiveTab("resultado")}
+                          className="btn btn-accent"
+                          style={{ fontSize: 12.5 }}
+                        >
+                          Ver Resultado Geral da Entrevista →
+                        </button>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ════════════════════════════════════════════════════════════
+  // ESTADO 3: LISTAGEM & DASHBOARD DE ENTREVISTAS DA EMPRESA
+  // ════════════════════════════════════════════════════════════
+  const concluidasCount = clientEntrevistas.filter(e => e.status === "concluida").length;
+  const emAndamentoCount = clientEntrevistas.filter(e => e.status === "em_andamento").length;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {/* Cabeçalho da metodologia */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
+        <div style={{ maxWidth: 620 }}>
+          <div className="eyebrow" style={{ marginBottom: 6 }}>Metodologia Certificari NR-1 · Avaliação qualitativa</div>
+          <h2 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: "var(--ink)", letterSpacing: "-0.02em" }}>
+            Entrevistas de riscos psicossociais — {cliente.name}
+          </h2>
+          <p style={{ margin: "8px 0 0", fontSize: 13.5, color: "var(--ink-muted)", lineHeight: 1.5 }}>
+            Roteiro estruturado de 12 fatores em 3 estruturas ({ENTREVISTA_ESTRUTURAS.map(e => e.short).join(", ")}) para diagnóstico e classificação de maturidade.
+          </p>
+        </div>
+
+        <button onClick={() => setModalNovo(true)} className="btn btn-accent" style={{ height: 42, flexShrink: 0 }}>
+          <Icon name="plus" size={16} /> Nova entrevista
+        </button>
+      </div>
+
+      {/* 3 KPI Cards da Empresa */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+        <div className="card" style={{ padding: "16px 20px" }}>
+          <div className="eyebrow">Total de entrevistas</div>
+          <div style={{ fontFamily: "var(--display)", fontWeight: 600, letterSpacing: "-0.02em", fontSize: 28, marginTop: 6, color: "var(--ink)" }}>{clientEntrevistas.length}</div>
+          <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 3 }}>Cadastradas para {cliente.name}</div>
+        </div>
+
+        <div className="card" style={{ padding: "16px 20px" }}>
+          <div className="eyebrow">Em andamento</div>
+          <div style={{ fontFamily: "var(--display)", fontWeight: 600, letterSpacing: "-0.02em", fontSize: 28, marginTop: 6, color: "var(--accent-cta)" }}>{emAndamentoCount}</div>
+          <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 3 }}>Aguardando preenchimento</div>
+        </div>
+
+        <div className="card" style={{ padding: "16px 20px" }}>
+          <div className="eyebrow">Concluídas</div>
+          <div style={{ fontFamily: "var(--display)", fontWeight: 600, letterSpacing: "-0.02em", fontSize: 28, marginTop: 6, color: "var(--health-deep)" }}>{concluidasCount}</div>
+          <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 3 }}>Entrevistas finalizadas</div>
+        </div>
+      </div>
+
+      {/* Lista de Entrevistas do Cliente */}
+      <div className="card" style={{ padding: 20, display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <h3 style={{ fontSize: 17, fontWeight: 700, margin: 0 }}>Entrevistas registradas</h3>
+            <p style={{ margin: "3px 0 0", fontSize: 12.5, color: "var(--ink-muted)" }}>Clique em uma entrevista para abrir o roteiro de 12 fatores ou avaliar.</p>
+          </div>
+        </div>
+
+        {clientEntrevistas.length > 0 ? (
+          <div style={{ display: "grid", gap: 10 }}>
+            {clientEntrevistas.map(item => {
+              const itemProgresso = calcularProgressoEntrevista(item);
+              const itemAgregados = agregarFatoresEntrevista(item);
+              const isConcl = item.status === "concluida" || (itemProgresso.totalParticipantes > 0 && itemProgresso.participantesConcluidos === itemProgresso.totalParticipantes);
+
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => {
+                    setSelectedEntrevistaId(item.id);
+                    setActiveParticipanteId(null);
+                    setActiveTab("fator-assedio");
+                  }}
+                  style={{
+                    padding: "16px 18px",
+                    borderRadius: 12,
+                    border: "1px solid var(--line)",
+                    background: "var(--surface)",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    transition: "all .15s",
+                    gap: 16
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = "var(--accent)"}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = "var(--line)"}
+                >
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+                      <span style={{ fontWeight: 700, fontSize: 14.5, color: "var(--ink)" }}>{item.titulo}</span>
+                      <span style={{
+                        fontSize: 10.5,
+                        fontWeight: 700,
+                        padding: "2px 8px",
+                        borderRadius: 99,
+                        background: isConcl ? "var(--health-soft)" : item.status === "em_andamento" ? "var(--amber-soft)" : "var(--canvas-warm)",
+                        color: isConcl ? "var(--health-deep)" : item.status === "em_andamento" ? "var(--amber)" : "var(--ink-muted)",
+                        border: `1px solid ${isConcl ? "var(--health)" : "var(--line)"}`
+                      }}>
+                        {isConcl ? "✓ Concluída" : item.status === "em_andamento" ? "Em andamento" : "Rascunho"}
+                      </span>
+                    </div>
+
+                    <div style={{ display: "flex", gap: 16, fontSize: 12.5, color: "var(--ink-muted)", marginBottom: 10, flexWrap: "wrap" }}>
+                      <span>Entrevistador: <strong>{item.entrevistador || "Caio Guedes"}</strong></span>
+                      {item.cargo && <span>Grupo: <strong>{item.cargo}</strong></span>}
+                      <span>Data: <strong>{item.data}</strong></span>
+                      <span>Progresso: <strong>{itemProgresso.participantesConcluidos}/{itemProgresso.totalParticipantes} pessoas</strong> ({itemProgresso.pct}%)</span>
+                    </div>
+
+                    <EntrevistaFatorStrip agregados={itemAgregados} />
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedEntrevistaId(item.id);
+                        setActiveParticipanteId(null);
+                        setActiveTab("fator-assedio");
+                      }}
+                      className="btn btn-primary"
+                      style={{ height: 34, fontSize: 12.5, padding: "0 14px" }}
+                    >
+                      Abrir Roteiro / Avaliar →
+                    </button>
+
+                    <button
+                      onClick={(e) => handleExcluirEntrevista(item.id, e)}
+                      className="btn btn-ghost"
+                      style={{ height: 34, width: 34, padding: 0, justifyContent: "center", color: "var(--ink-muted)" }}
+                      title="Excluir entrevista"
+                    >
+                      <Icon name="trash" size={13} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div style={{ textAlign: "center", padding: "32px 0", color: "var(--ink-muted)" }}>
+            <p>Nenhuma entrevista cadastrada para esta empresa ainda.</p>
+            <button onClick={() => setModalNovo(true)} className="btn btn-primary" style={{ height: 38, marginTop: 8 }}>
+              + Criar Primeira Entrevista
+            </button>
+          </div>
+        )}
+
+        {/* Rodapé de Ação da Etapa */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12, paddingTop: 14, borderTop: "1px solid var(--line)" }}>
+          <div style={{ fontSize: 12.5, color: "var(--ink-muted)" }}>
+            {concluidasCount > 0
+              ? `✓ ${concluidasCount} entrevista(s) finalizada(s) para esta empresa.`
+              : "Preencha as entrevistas para consolidar a avaliação qualitativa no relatório."}
+          </div>
+
+          <button
+            onClick={() => {
+              onUpdate({ status: "concluida" });
+              onNext();
+            }}
+            className="btn btn-accent"
+          >
+            Salvar e Avançar para Relatórios (Etapa 7) →
+          </button>
+        </div>
+      </div>
+
+      {/* Modal Nova Entrevista */}
+      {modalNovo && (
+        <div
+          style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+          onClick={() => setModalNovo(false)}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 14, padding: 28, width: "100%", maxWidth: 500, boxShadow: "var(--shadow-modal)" }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+              <div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Nova Entrevista Qualitativa</h3>
+                <p style={{ margin: "2px 0 0", fontSize: 12.5, color: "var(--ink-muted)" }}>Empresa: <strong>{cliente.name}</strong></p>
+              </div>
+              <button onClick={() => setModalNovo(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--ink-muted)" }}>
+                <Icon name="x" size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCriarEntrevista} style={{ display: "grid", gap: 14 }}>
+              <div>
+                <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, marginBottom: 4 }}>Título da Entrevista</label>
+                <input
+                  type="text"
+                  required
+                  value={novoTitulo}
+                  onChange={e => setNovoTitulo(e.target.value)}
+                  style={{ width: "100%", height: 38, padding: "0 10px", borderRadius: 8, border: "1px solid var(--line)", fontSize: 13, background: "var(--surface)", color: "var(--ink)", boxSizing: "border-box" }}
+                />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, marginBottom: 4 }}>Entrevistador (Consultor)</label>
+                  <input
+                    type="text"
+                    required
+                    value={novoEntrevistador}
+                    onChange={e => setNovoEntrevistador(e.target.value)}
+                    style={{ width: "100%", height: 38, padding: "0 10px", borderRadius: 8, border: "1px solid var(--line)", fontSize: 13, background: "var(--surface)", color: "var(--ink)", boxSizing: "border-box" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, marginBottom: 4 }}>Grupo / Cargo Avaliado</label>
+                  <input
+                    type="text"
+                    value={novoCargo}
+                    onChange={e => setNovoCargo(e.target.value)}
+                    placeholder="Ex: Operação, Lideranças..."
+                    style={{ width: "100%", height: 38, padding: "0 10px", borderRadius: 8, border: "1px solid var(--line)", fontSize: 13, background: "var(--surface)", color: "var(--ink)", boxSizing: "border-box" }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, marginBottom: 4 }}>Pessoas a entrevistar</label>
+                <input
+                  type="number"
+                  min={1}
+                  required
+                  value={novoQtdPessoas}
+                  onChange={e => setNovoQtdPessoas(Math.max(1, Number(e.target.value) || 1))}
+                  style={{ width: "100%", height: 38, padding: "0 10px", borderRadius: 8, border: "1px solid var(--line)", fontSize: 13, background: "var(--surface)", color: "var(--ink)", boxSizing: "border-box" }}
+                />
+              </div>
+
+              <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 8 }}>
+                <button type="button" onClick={() => setModalNovo(false)} className="btn btn-ghost" style={{ border: "1px solid var(--line)" }}>
+                  Cancelar
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  Criar Entrevista e Iniciar Avaliação
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// 7. RELATÓRIOS — liberada automaticamente quando o Diagnóstico (etapa 5) é concluído
 const relatorioRiskColor = (v) => (v >= 2.5 ? "var(--coral)" : v >= 1.5 ? "var(--amber)" : "var(--health)");
 
 const RelatorioDimRow = ({ dim }) => {

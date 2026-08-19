@@ -190,6 +190,7 @@ input::placeholder { color: var(--ink-faint); }
 .pill-sky     { background: var(--sky-soft); color: #1E4A9E; border-color: #C5D9F7; }
 .pill-neutral { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border); }
 .pill-brand   { background: #FFF4EC; color: #F66B0A; border-color: #FFE3CF; }
+.pill-health  { background: var(--health-soft); color: var(--health-deep); border-color: var(--health-soft); }
 
 .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; background: currentColor; }
 

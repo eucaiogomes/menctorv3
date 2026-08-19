@@ -1,4 +1,4 @@
-/* global React, Icon, Logo, CLIENTES, DIAGNOSTICOS, CAMPANHAS, getCampanhaRespondidos, getCampanhaStatusEfetivo, jaRespondeuCampanha, registrarRespostaCampanha, fmtData */
+/* global React, Icon, Logo, CLIENTES, DIAGNOSTICOS, CAMPANHAS, getCampanhaRespondidos, getCampanhaStatusEfetivo, jaRespondeuCampanha, registrarRespostaCampanha, fmtData, ENTREVISTA_FATORES */
 
 // ════════════════════════════════════════════════════════════
 // CAMPANHA RESPONDER — página pública (link da campanha):
@@ -391,9 +391,18 @@ const TLX_QUESTIONARIO = {
   ],
 };
 
+// Entrevista como campanha de autorresposta — reaproveita o mesmo roteiro de
+// 12 fatores (3 estruturas) usado na entrevista conduzida pelo consultor,
+// cada fator vira uma dimensão e suas perguntas viram itens de escala.
+const ENTREVISTA_QUESTIONARIO = {
+  escala: ESCALA_INTENSIDADE,
+  dimensoes: ENTREVISTA_FATORES.map(f => ({ nome: f.nome, perguntas: f.perguntas })),
+};
+
 const QUESTIONARIOS_POR_DIAGNOSTICO = {
   copsoq: COPSOQ_QUESTIONARIO,
   hse: HSE_QUESTIONARIO,
+  entrevista: ENTREVISTA_QUESTIONARIO,
   edrps: EDRPS_QUESTIONARIO,
   pulse: PULSE_QUESTIONARIO,
   burnout: BURNOUT_QUESTIONARIO,

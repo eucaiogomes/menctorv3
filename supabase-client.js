@@ -283,4 +283,80 @@ MenctorDB.listSteps = async () => {
   return supabaseRequest("steps?select=*&order=number");
 };
 
+// =====================================================
+// CANAL DE DENÚNCIAS
+// =====================================================
+
+const toDbDenuncia = (d) => ({
+  id: d.id,
+  protocolo: d.protocolo,
+  cliente_id: d.clienteId,
+  data: d.data,
+  status: d.status || "triagem",
+  gravidade: d.gravidade || null,
+  tipo_id: d.tipoId || null,
+  natureza: d.natureza || null,
+  anonimo: d.anonimo !== false,
+  denunciante: d.denunciante || null,
+  area: d.area || null,
+  relato: d.relato || "",
+  evidencias: d.evidencias || [],
+  admissibilidade: d.admissibilidade || null,
+  prazo_final: d.prazoFinal || null,
+  parecer: d.parecer || null,
+  resultado: d.resultado || null,
+  recomendacoes: d.recomendacoes || null,
+  andamentos: d.andamentos || [],
+  mensagens: d.mensagens || [],
+  audit_log: d.auditLog || [],
+});
+
+const toAppDenuncia = (row) => ({
+  id: row.id,
+  protocolo: row.protocolo,
+  clienteId: row.cliente_id,
+  data: row.data,
+  status: row.status,
+  gravidade: row.gravidade,
+  tipoId: row.tipo_id,
+  natureza: row.natureza,
+  anonimo: row.anonimo,
+  denunciante: row.denunciante,
+  area: row.area,
+  relato: row.relato,
+  evidencias: row.evidencias || [],
+  admissibilidade: row.admissibilidade,
+  prazoFinal: row.prazo_final,
+  parecer: row.parecer,
+  resultado: row.resultado,
+  recomendacoes: row.recomendacoes,
+  andamentos: row.andamentos || [],
+  mensagens: row.mensagens || [],
+  auditLog: row.audit_log || [],
+});
+
+MenctorDB.listDenuncias = async () => {
+  const rows = await supabaseRequest("denuncias?select=*&order=data.desc");
+  return rows.map(toAppDenuncia);
+};
+
+MenctorDB.getDenuncia = async (id) => {
+  const rows = await supabaseRequest(`denuncias?id=eq.${encodeURIComponent(id)}&select=*`);
+  return rows?.[0] ? toAppDenuncia(rows[0]) : null;
+};
+
+MenctorDB.getDenunciaByProtocolo = async (protocolo) => {
+  const rows = await supabaseRequest(`denuncias?protocolo=eq.${encodeURIComponent(protocolo)}&select=*`);
+  return rows?.[0] ? toAppDenuncia(rows[0]) : null;
+};
+
+MenctorDB.upsertDenuncia = async (denuncia) => {
+  const rows = await supabaseRequest("denuncias?on_conflict=id", {
+    method: "POST",
+    headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+    body: JSON.stringify(toDbDenuncia(denuncia)),
+  });
+  return rows?.[0] ? toAppDenuncia(rows[0]) : null;
+};
+
 Object.assign(window, { MenctorDB });

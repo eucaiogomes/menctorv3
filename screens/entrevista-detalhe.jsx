@@ -1,4 +1,4 @@
-/* global React, Icon, Page, CLIENTES, ENTREVISTA_ESTRUTURAS, ENTREVISTA_FATORES, ENTREVISTA_MATURIDADE, CLASSIFICACAO_LABELS, CLASSIFICACAO_CORES, ENTREVISTAS_MOCK */
+/* global React, Icon, Page, CLIENTES, ENTREVISTA_ESTRUTURAS, ENTREVISTA_FATORES, ENTREVISTA_MATURIDADE, CLASSIFICACAO_LABELS, CLASSIFICACAO_CORES, ENTREVISTAS_MOCK, getEntrevistaParticipantes, agregarFatoresEntrevista, calcularProgressoEntrevista, calcularMaturidadeEntrevista */
 const { useState, useMemo, useEffect } = React;
 
 const EntrevistaDetalheScreen = ({ navigate, id: paramId, params = {} }) => {
@@ -24,24 +24,26 @@ const EntrevistaDetalheScreen = ({ navigate, id: paramId, params = {} }) => {
     return CLIENTES.find(c => c.id === entrevista.clienteId) || CLIENTES[0];
   }, [entrevista.clienteId]);
 
-  const fatoresAvaliados = entrevista.fatoresAvaliados || {};
+  const participantes = useMemo(() => getEntrevistaParticipantes(entrevista), [entrevista]);
+  const [activeParticipanteId, setActiveParticipanteId] = useState(() => participantes[0]?.id);
+  const activeParticipante = participantes.find(p => p.id === activeParticipanteId) || participantes[0];
+  const fatoresAvaliados = activeParticipante?.fatoresAvaliados || {};
 
-  // Save changes
+  // Save changes — grava a resposta na pessoa ativa e recalcula o status geral
   const updateFator = (fatorId, partial) => {
     const current = fatoresAvaliados[fatorId] || { classificacao: null, observacoes: "", respostas: {}, evidencias: [] };
-    const updatedFatores = {
-      ...fatoresAvaliados,
-      [fatorId]: { ...current, ...partial }
-    };
+    const updatedParticipantes = participantes.map(p => p.id !== activeParticipante.id ? p : {
+      ...p,
+      fatoresAvaliados: { ...p.fatoresAvaliados, [fatorId]: { ...current, ...partial } }
+    });
 
-    const count = Object.keys(updatedFatores).filter(k => updatedFatores[k]?.classificacao).length;
-    const nextStatus = count === 12 ? "concluida" : count > 0 ? "em_andamento" : "rascunho";
+    const progresso = calcularProgressoEntrevista({ participantes: updatedParticipantes });
+    const nextStatus = progresso.totalRespondido === 0 ? "rascunho"
+      : progresso.participantesConcluidos === progresso.totalParticipantes ? "concluida"
+      : "em_andamento";
 
-    const updatedEntrevista = {
-      ...entrevista,
-      status: nextStatus,
-      fatoresAvaliados: updatedFatores
-    };
+    const updatedEntrevista = { ...entrevista, status: nextStatus, participantes: updatedParticipantes };
+    delete updatedEntrevista.fatoresAvaliados;
 
     setEntrevista(updatedEntrevista);
 
@@ -59,58 +61,10 @@ const EntrevistaDetalheScreen = ({ navigate, id: paramId, params = {} }) => {
     } catch (e) { /* ignore */ }
   };
 
-  // Maturity calculation
-  const resultadoMaturidade = useMemo(() => {
-    const avaliadosList = Object.entries(fatoresAvaliados).map(([fid, data]) => {
-      const fatorObj = ENTREVISTA_FATORES.find(f => f.id === fid);
-      return { fator: fatorObj, ...data };
-    }).filter(item => item.classificacao);
-
-    if (avaliadosList.length === 0) return null;
-
-    const soma = avaliadosList.reduce((acc, cur) => acc + (cur.classificacao || 0), 0);
-    const media = soma / avaliadosList.length;
-
-    // Critérios de maturidade CERTIFICA NR1:
-    // Nível 4: Se houver fator com classificação 5 em assédio, liderança abusiva, ou média >= 3.8
-    // Nível 3: Média >= 2.8 ou 3+ fatores com classificação >= 4
-    // Nível 2: Média >= 1.8
-    // Nível 1: Média < 1.8 (Preventiva)
-    const criticosCount = avaliadosList.filter(a => a.classificacao >= 4).length;
-    const temGrave = avaliadosList.some(a => (a.fator?.id === "assedio" || a.fator?.id === "lideranca_abusiva") && a.classificacao >= 4);
-
-    let nivelId = 1;
-    if (media >= 3.8 || (temGrave && criticosCount >= 2)) {
-      nivelId = 4;
-    } else if (media >= 2.8 || criticosCount >= 3 || temGrave) {
-      nivelId = 3;
-    } else if (media >= 1.8 || criticosCount >= 1) {
-      nivelId = 2;
-    } else {
-      nivelId = 1;
-    }
-
-    const nivelObj = ENTREVISTA_MATURIDADE.find(n => n.nivel === nivelId) || ENTREVISTA_MATURIDADE[0];
-
-    // Stats by structure
-    const relacoesAvg = avaliadosList.filter(a => a.fator?.estruturaId === "relacoes");
-    const atividadesAvg = avaliadosList.filter(a => a.fator?.estruturaId === "atividades");
-    const orgAvg = avaliadosList.filter(a => a.fator?.estruturaId === "organizacional");
-
-    const calcAvg = (arr) => arr.length ? (arr.reduce((s, i) => s + (i.classificacao || 0), 0) / arr.length).toFixed(2) : "—";
-
-    return {
-      media: media.toFixed(2),
-      nivel: nivelObj,
-      totalAvaliados: avaliadosList.length,
-      mediasPorEstrutura: {
-        relacoes: calcAvg(relacoesAvg),
-        atividades: calcAvg(atividadesAvg),
-        organizacional: calcAvg(orgAvg),
-      },
-      fatoresCriticos: avaliadosList.filter(a => a.classificacao >= 4)
-    };
-  }, [fatoresAvaliados]);
+  // Maturidade consolidada — média das respostas de todas as pessoas por fator
+  const resultadoMaturidade = useMemo(() => calcularMaturidadeEntrevista(entrevista), [entrevista]);
+  const agregados = useMemo(() => agregarFatoresEntrevista(entrevista), [entrevista]);
+  const progresso = useMemo(() => calcularProgressoEntrevista(entrevista), [entrevista]);
 
   const activeFactor = useMemo(() => {
     if (activeTab === "resultado") return null;
@@ -119,9 +73,6 @@ const EntrevistaDetalheScreen = ({ navigate, id: paramId, params = {} }) => {
   }, [activeTab]);
 
   const activeFactorData = activeFactor ? (fatoresAvaliados[activeFactor.id] || { classificacao: null, observacoes: "", respostas: {}, evidencias: [] }) : null;
-
-  const totalAvaliados = Object.values(fatoresAvaliados).filter(f => f.classificacao).length;
-  const progressoGeral = Math.round((totalAvaliados / 12) * 100);
 
   return (
     <Page>
@@ -136,10 +87,10 @@ const EntrevistaDetalheScreen = ({ navigate, id: paramId, params = {} }) => {
 
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 12.5, color: "var(--ink-muted)" }}>
-            Progresso Geral: <strong>{totalAvaliados}/12</strong> ({progressoGeral}%)
+            Pessoas concluídas: <strong>{progresso.participantesConcluidos}/{progresso.totalParticipantes}</strong> ({progresso.pct}%)
           </span>
           <div style={{ width: 120, height: 8, borderRadius: 999, background: "var(--border)", overflow: "hidden" }}>
-            <div style={{ height: "100%", background: progressoGeral === 100 ? "var(--health)" : "var(--accent)", width: `${progressoGeral}%` }} />
+            <div style={{ height: "100%", background: progresso.pct === 100 ? "var(--health)" : "var(--accent)", width: `${progresso.pct}%` }} />
           </div>
           <button
             onClick={() => setActiveTab("resultado")}
@@ -159,6 +110,7 @@ const EntrevistaDetalheScreen = ({ navigate, id: paramId, params = {} }) => {
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 12, color: "var(--ink-muted)" }}>
             {cliente.name} · {cliente.sector} · {entrevista.entrevistador}
+            {entrevista.qtdPessoas ? ` · ${entrevista.qtdPessoas} ${entrevista.qtdPessoas === 1 ? "pessoa entrevistada" : "pessoas entrevistadas"}` : ""}
           </div>
           <h2 style={{ fontSize: 18, fontWeight: 700, margin: "2px 0 0", color: "var(--ink)" }}>
             {entrevista.titulo}
@@ -174,6 +126,45 @@ const EntrevistaDetalheScreen = ({ navigate, id: paramId, params = {} }) => {
           </span>
         </div>
       </div>
+
+      {/* Seletor de participante — a quem as respostas do roteiro pertencem */}
+      {participantes.length > 1 && activeTab !== "resultado" && (
+        <div className="card" style={{ padding: "12px 14px", marginBottom: 20, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <span style={{ fontSize: 11.5, fontWeight: 700, color: "var(--ink-faint)", textTransform: "uppercase", letterSpacing: "0.06em", flexShrink: 0 }}>
+            Respondendo por
+          </span>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {participantes.map(p => {
+              const count = Object.values(p.fatoresAvaliados || {}).filter(f => f?.classificacao).length;
+              const done = count === ENTREVISTA_FATORES.length;
+              const isActive = p.id === activeParticipante.id;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setActiveParticipanteId(p.id)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    padding: "6px 12px", borderRadius: 999,
+                    background: isActive ? "var(--accent-soft)" : "var(--surface-2)",
+                    border: isActive ? "1px solid var(--accent-light)" : "1px solid var(--border)",
+                    color: isActive ? "var(--accent-cta)" : "var(--ink-soft)",
+                    fontSize: 12.5, fontWeight: isActive ? 700 : 500, cursor: "pointer"
+                  }}
+                >
+                  {p.nome}
+                  <span style={{
+                    fontSize: 10.5, fontWeight: 700, padding: "1px 6px", borderRadius: 999,
+                    background: done ? "var(--health-soft)" : "var(--surface)",
+                    color: done ? "var(--health-deep)" : "var(--ink-muted)",
+                  }}>
+                    {count}/{ENTREVISTA_FATORES.length}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* 2-Column Layout */}
       <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 20, alignItems: "flex-start" }}>
@@ -347,25 +338,29 @@ const EntrevistaDetalheScreen = ({ navigate, id: paramId, params = {} }) => {
                         <th style={{ padding: "8px 10px" }}>#</th>
                         <th style={{ padding: "8px 10px" }}>Fator de Risco</th>
                         <th style={{ padding: "8px 10px" }}>Estrutura</th>
-                        <th style={{ padding: "8px 10px" }}>Classificação</th>
-                        <th style={{ padding: "8px 10px" }}>Evidências Marcadas</th>
+                        <th style={{ padding: "8px 10px" }}>Média entre pessoas</th>
+                        <th style={{ padding: "8px 10px" }}>Respostas</th>
+                        <th style={{ padding: "8px 10px" }}>Evidências</th>
                         <th style={{ padding: "8px 10px" }}>Ação</th>
                       </tr>
                     </thead>
                     <tbody>
                       {ENTREVISTA_FATORES.map(fator => {
-                        const fData = fatoresAvaliados[fator.id];
-                        const classif = fData?.classificacao;
-                        const evCount = fData?.evidencias?.length || 0;
+                        const ag = agregados[fator.id];
+                        const classif = ag?.classificacaoArredondada;
+                        const evCount = participantes.reduce((s, p) => s + (p.fatoresAvaliados?.[fator.id]?.evidencias?.length || 0), 0);
                         const estr = ENTREVISTA_ESTRUTURAS.find(e => e.id === fator.estruturaId);
 
                         return (
                           <tr key={fator.id} style={{ borderBottom: "1px solid var(--border)" }}>
                             <td style={{ padding: "10px", fontWeight: 700, color: "var(--ink-muted)" }}>{fator.numero}</td>
-                            <td style={{ padding: "10px", fontWeight: 600, color: "var(--ink)" }}>{fator.nome}</td>
+                            <td style={{ padding: "10px", fontWeight: 600, color: "var(--ink)" }}>
+                              {fator.nome}
+                              {ag?.isCritico && <span className="pill pill-coral" style={{ marginLeft: 8 }}>crítico</span>}
+                            </td>
                             <td style={{ padding: "10px", color: "var(--ink-muted)" }}>{estr?.short}</td>
                             <td style={{ padding: "10px" }}>
-                              {classif ? (
+                              {ag ? (
                                 <span style={{
                                   display: "inline-flex", alignItems: "center", gap: 6,
                                   padding: "3px 8px", borderRadius: 999,
@@ -374,11 +369,14 @@ const EntrevistaDetalheScreen = ({ navigate, id: paramId, params = {} }) => {
                                   fontWeight: 700, fontSize: 11.5
                                 }}>
                                   <span style={{ width: 6, height: 6, borderRadius: 999, background: CLASSIFICACAO_CORES[classif] }} />
-                                  {classif} · {CLASSIFICACAO_LABELS[classif]}
+                                  {ag.media.toFixed(1)} · {CLASSIFICACAO_LABELS[classif]}
                                 </span>
                               ) : (
                                 <span style={{ color: "var(--ink-faint)", fontSize: 12 }}>Não avaliado</span>
                               )}
+                            </td>
+                            <td style={{ padding: "10px", color: "var(--ink-muted)", fontSize: 12 }}>
+                              {ag ? `${ag.totalRespostas}/${participantes.length} pessoas` : `0/${participantes.length} pessoas`}
                             </td>
                             <td style={{ padding: "10px", color: "var(--ink-muted)", fontSize: 12 }}>
                               {evCount > 0 ? `${evCount} identificadas` : "Nenhuma"}
