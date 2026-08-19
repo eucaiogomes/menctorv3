@@ -50,33 +50,144 @@ const DenunciasScreen = ({ navigate }) => {
 
   return (
     <Page>
-      {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
-        <div>
-          <div className="eyebrow" style={{ color: "var(--accent)", marginBottom: 4 }}>
-            Compliance & Ouvidoria · Lei 14.457/2022 & NR-01
+      {/* ─── HERO HEADER BANNER ─── */}
+      <div style={{
+        background: "radial-gradient(ellipse at 70% 50%, #0F3870 0%, #00204D 55%, #05162E 100%)",
+        borderRadius: 14,
+        padding: "26px 34px",
+        color: "#FFFFFF",
+        marginBottom: 24,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        position: "relative",
+        overflow: "hidden",
+        boxShadow: "0 8px 24px rgba(0,32,77,0.12)"
+      }}>
+        {/* Network nodes background graphic */}
+        <div style={{ position: "absolute", right: 260, top: 0, bottom: 0, width: 340, pointerEvents: "none", opacity: 0.65 }}>
+          <svg width="340" height="130" viewBox="0 0 340 130" fill="none">
+            {/* Connection lines */}
+            <line x1="30" y1="40" x2="100" y2="80" stroke="rgba(96,165,250,0.35)" strokeWidth="1" strokeDasharray="3 3"/>
+            <line x1="100" y1="80" x2="170" y2="30" stroke="rgba(96,165,250,0.4)" strokeWidth="1"/>
+            <line x1="170" y1="30" x2="240" y2="90" stroke="rgba(96,165,250,0.35)" strokeWidth="1" strokeDasharray="2 2"/>
+            <line x1="240" y1="90" x2="310" y2="50" stroke="rgba(96,165,250,0.4)" strokeWidth="1"/>
+            <line x1="100" y1="80" x2="240" y2="90" stroke="rgba(96,165,250,0.25)" strokeWidth="1"/>
+
+            {/* Nodes */}
+            <circle cx="30" cy="40" r="14" fill="#0E2748" stroke="#3B82F6" strokeWidth="1.5"/>
+            <circle cx="100" cy="80" r="16" fill="#0E2748" stroke="#60A5FA" strokeWidth="1.5"/>
+            <circle cx="170" cy="30" r="14" fill="#0E2748" stroke="#3B82F6" strokeWidth="1.5"/>
+            <circle cx="240" cy="90" r="15" fill="#0E2748" stroke="#60A5FA" strokeWidth="1.5"/>
+            <circle cx="310" cy="50" r="14" fill="#0E2748" stroke="#3B82F6" strokeWidth="1.5"/>
+
+            {/* User icons in nodes */}
+            <circle cx="30" cy="37" r="3.5" fill="#93C5FD"/>
+            <path d="M22 47c0-2.5 3.5-4 8-4s8 1.5 8 4" fill="#93C5FD"/>
+
+            <circle cx="100" cy="77" r="4" fill="#93C5FD"/>
+            <path d="M91 88c0-3 4-5 9-5s9 2 9 5" fill="#93C5FD"/>
+
+            <circle cx="170" cy="27" r="3.5" fill="#93C5FD"/>
+            <path d="M162 37c0-2.5 3.5-4 8-4s8 1.5 8 4" fill="#93C5FD"/>
+
+            <circle cx="240" cy="87" r="3.5" fill="#93C5FD"/>
+            <path d="M232 97c0-2.5 3.5-4 8-4s8 1.5 8 4" fill="#93C5FD"/>
+
+            <circle cx="310" cy="47" r="3.5" fill="#93C5FD"/>
+            <path d="M302 57c0-2.5 3.5-4 8-4s8 1.5 8 4" fill="#93C5FD"/>
+          </svg>
+        </div>
+
+        {/* Central glowing shield illustration */}
+        <div style={{ position: "absolute", right: 290, top: "50%", transform: "translateY(-50%)", zIndex: 2 }}>
+          <div style={{
+            width: 72, height: 86,
+            borderRadius: "10px 10px 34px 34px",
+            background: "linear-gradient(145deg, #3B82F6, #1D4ED8 70%, #172554)",
+            border: "2px solid #93C5FD",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: "0 0 35px rgba(59,130,246,0.6), inset 0 2px 6px rgba(255,255,255,0.6)"
+          }}>
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
           </div>
-          <h1 className="display" style={{ fontSize: 28, margin: 0, color: "var(--ink)" }}>
+        </div>
+
+        {/* Left Headline */}
+        <div style={{ zIndex: 3, maxWidth: 580 }}>
+          <div style={{
+            fontSize: 11,
+            fontWeight: 800,
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+            color: "#FF6A00",
+            marginBottom: 6
+          }}>
+            COMPLIANCE & OUVIDORIA • LEI 14.457/2022 & NR-01
+          </div>
+          <h1 style={{
+            fontSize: 26,
+            fontWeight: 700,
+            margin: 0,
+            color: "#FFFFFF",
+            letterSpacing: "-0.01em"
+          }}>
             Canal de Denúncias e Escuta
           </h1>
-          <p style={{ margin: "6px 0 0", fontSize: 13.5, color: "var(--ink-muted)" }}>
+          <p style={{
+            margin: "8px 0 0",
+            fontSize: 13,
+            color: "rgba(255,255,255,0.78)",
+            lineHeight: 1.45
+          }}>
             Ambiente sigiloso e independente para triagem, investigação, governança e tratamento humanizado de manifestações.
           </p>
         </div>
 
-        <div style={{ display: "flex", gap: 10 }}>
+        {/* Right Action Button */}
+        <div style={{ zIndex: 3 }}>
           <button
             onClick={() => navigate("denuncia-portal")}
-            className="btn btn-soft"
-            style={{ height: 40, fontSize: 13, display: "flex", alignItems: "center", gap: 8 }}
+            style={{
+              height: 38,
+              padding: "0 18px",
+              borderRadius: 8,
+              background: "rgba(255,255,255,0.06)",
+              backdropFilter: "blur(6px)",
+              border: "1px solid rgba(255,255,255,0.3)",
+              color: "#FFFFFF",
+              fontSize: 12.5,
+              fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              cursor: "pointer",
+              transition: "all .15s ease"
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.15)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.5)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)"; }}
           >
-            <Icon name="external" size={15} /> Abrir Portal do Denunciante
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+            Abrir Portal do Denunciante
           </button>
         </div>
       </div>
 
-      {/* Main module navigation tabs */}
-      <div style={{ display: "flex", gap: 6, borderBottom: "2px solid var(--border)", marginBottom: 24, paddingBottom: 2 }}>
+      {/* ─── NAVIGATION TABS (Active Orange Underline) ─── */}
+      <div style={{
+        display: "flex",
+        gap: 28,
+        borderBottom: "1px solid #E2E8F0",
+        marginBottom: 24,
+        paddingBottom: 0
+      }}>
         {[
           { id: "dashboard", label: "Dashboard", icon: "bar-chart" },
           { id: "casos", label: `Casos (${denuncias.length})`, icon: "shield" },
@@ -89,16 +200,47 @@ const DenunciasScreen = ({ navigate }) => {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               style={{
-                padding: "8px 16px", borderRadius: "8px 8px 0 0",
-                background: isAct ? "var(--surface)" : "transparent",
-                color: isAct ? "var(--accent)" : "var(--ink-muted)",
-                fontWeight: isAct ? 700 : 500, fontSize: 13.5,
-                border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8,
-                borderBottom: isAct ? "2px solid var(--accent)" : "2px solid transparent",
-                marginBottom: -4, transition: "all .15s"
+                padding: "8px 4px 14px",
+                background: "transparent",
+                color: isAct ? "#FF6A00" : "#64748B",
+                fontWeight: isAct ? 700 : 500,
+                fontSize: 13.5,
+                border: "none",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                borderBottom: isAct ? "2.5px solid #FF6A00" : "2.5px solid transparent",
+                marginBottom: -1,
+                transition: "all .15s ease"
               }}
             >
-              <Icon name={tab.icon} size={15} color={isAct ? "var(--accent)" : "var(--ink-muted)"} />
+              {tab.id === "dashboard" && (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="20" x2="18" y2="10"/>
+                  <line x1="12" y1="20" x2="12" y2="4"/>
+                  <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+              )}
+              {tab.id === "casos" && (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                </svg>
+              )}
+              {tab.id === "governanca" && (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              )}
+              {tab.id === "gestao" && (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+              )}
               <span>{tab.label}</span>
             </button>
           );
@@ -108,172 +250,566 @@ const DenunciasScreen = ({ navigate }) => {
       {/* ─── TAB 1: DASHBOARD ─── */}
       {activeTab === "dashboard" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          {/* 4 KPI Cards */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
-            <div className="card" style={{ padding: "18px 20px" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--ink-muted)", letterSpacing: "0.06em" }}>
-                Total de Denúncias
+
+          {/* 1. 4 KPI Cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+
+            {/* KPI 1: TOTAL DE DENÚNCIAS */}
+            <div className="card" style={{
+              background: "#FFFFFF",
+              borderRadius: 14,
+              padding: "20px 22px",
+              border: "1px solid #E2E8F0",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: "50%",
+                  background: "#DBEAFE", color: "#2563EB",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  flexShrink: 0
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "#64748B", letterSpacing: "0.06em" }}>
+                    TOTAL DE DENÚNCIAS
+                  </div>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: "#00204D", margin: "2px 0 2px" }}>
+                    {kpis.total}
+                  </div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#16A34A" }}>
+                    ↑ 18% vs mês ant.
+                  </div>
+                </div>
               </div>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 6 }}>
-                <span style={{ fontFamily: "var(--display)", fontSize: 30, fontWeight: 700, color: "var(--ink)" }}>{kpis.total}</span>
-                <span style={{ fontSize: 11, fontWeight: 600, color: "var(--health-deep)" }}>+18% vs mês ant.</span>
+
+              {/* Sparkline Blue */}
+              <div style={{ width: 60, height: 28 }}>
+                <svg width="60" height="28" viewBox="0 0 60 28" fill="none">
+                  <path d="M2 22 L15 19 L28 23 L42 12 L58 10" stroke="#3B82F6" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
             </div>
 
-            <div className="card" style={{ padding: "18px 20px" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--warning)", letterSpacing: "0.06em" }}>
-                Em Tratamento
+            {/* KPI 2: EM TRATAMENTO */}
+            <div className="card" style={{
+              background: "#FFFFFF",
+              borderRadius: 14,
+              padding: "20px 22px",
+              border: "1px solid #E2E8F0",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: "50%",
+                  background: "#FEF3C7", color: "#D97706",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  flexShrink: 0
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 22h14"/>
+                    <path d="M5 2h14"/>
+                    <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/>
+                    <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "#64748B", letterSpacing: "0.06em" }}>
+                    EM TRATAMENTO
+                  </div>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: "#00204D", margin: "2px 0 2px" }}>
+                    {kpis.emTratamento}
+                  </div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#F97316" }}>
+                    ↑ 8% vs mês ant.
+                  </div>
+                </div>
               </div>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 6 }}>
-                <span style={{ fontFamily: "var(--display)", fontSize: 30, fontWeight: 700, color: "var(--warning)" }}>{kpis.emTratamento}</span>
-                <span style={{ fontSize: 11, fontWeight: 600, color: "var(--warning)" }}>+8% vs mês ant.</span>
+
+              {/* Sparkline Orange */}
+              <div style={{ width: 60, height: 28 }}>
+                <svg width="60" height="28" viewBox="0 0 60 28" fill="none">
+                  <path d="M2 20 L16 17 L29 22 L42 14 L58 12" stroke="#F97316" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
             </div>
 
-            <div className="card" style={{ padding: "18px 20px" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--health-deep)", letterSpacing: "0.06em" }}>
-                Concluídas
+            {/* KPI 3: CONCLUÍDAS */}
+            <div className="card" style={{
+              background: "#FFFFFF",
+              borderRadius: 14,
+              padding: "20px 22px",
+              border: "1px solid #E2E8F0",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: "50%",
+                  background: "#D1FAE5", color: "#10B981",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  flexShrink: 0
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "#64748B", letterSpacing: "0.06em" }}>
+                    CONCLUÍDAS
+                  </div>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: "#00204D", margin: "2px 0 2px" }}>
+                    {kpis.concluidas}
+                  </div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#16A34A" }}>
+                    ↑ 20% vs mês ant.
+                  </div>
+                </div>
               </div>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 6 }}>
-                <span style={{ fontFamily: "var(--display)", fontSize: 30, fontWeight: 700, color: "var(--health-deep)" }}>{kpis.concluidas}</span>
-                <span style={{ fontSize: 11, fontWeight: 600, color: "var(--health-deep)" }}>+20% vs mês ant.</span>
+
+              {/* Sparkline Green */}
+              <div style={{ width: 60, height: 28 }}>
+                <svg width="60" height="28" viewBox="0 0 60 28" fill="none">
+                  <path d="M2 24 L16 23 L30 19 L44 21 L58 11" stroke="#10B981" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
             </div>
 
-            <div className="card" style={{ padding: "18px 20px" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--sky)", letterSpacing: "0.06em" }}>
-                Tempo Médio de Resposta
+            {/* KPI 4: TEMPO MÉDIO DE RESPOSTA */}
+            <div className="card" style={{
+              background: "#FFFFFF",
+              borderRadius: 14,
+              padding: "20px 22px",
+              border: "1px solid #E2E8F0",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: "50%",
+                  background: "#EDE9FE", color: "#8B5CF6",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  flexShrink: 0
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "#64748B", letterSpacing: "0.06em" }}>
+                    TEMPO MÉDIO DE RESPOSTA
+                  </div>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: "#00204D", margin: "2px 0 2px" }}>
+                    {kpis.tempoMedio} dias
+                  </div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#16A34A" }}>
+                    ↓ 15% vs mês ant.
+                  </div>
+                </div>
               </div>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 6 }}>
-                <span style={{ fontFamily: "var(--display)", fontSize: 30, fontWeight: 700, color: "var(--sky)" }}>{kpis.tempoMedio} dias</span>
-                <span style={{ fontSize: 11, fontWeight: 600, color: "var(--health-deep)" }}>-15% vs mês ant.</span>
+
+              {/* Sparkline Purple */}
+              <div style={{ width: 60, height: 28 }}>
+                <svg width="60" height="28" viewBox="0 0 60 28" fill="none">
+                  <path d="M2 19 L16 16 L30 19 L44 14 L58 18" stroke="#8B5CF6" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
             </div>
+
           </div>
 
-          {/* Charts Row */}
+          {/* 2. Charts Row (2 Columns) */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-            {/* Donut Chart Representation: Denúncias por Tipo */}
-            <div className="card" style={{ padding: "22px 24px" }}>
-              <h3 style={{ fontSize: 15, fontWeight: 700, margin: "0 0 16px", color: "var(--ink)" }}>
-                Denúncias por Tipo
-              </h3>
-              <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
-                <div style={{
-                  width: 140, height: 140, borderRadius: 999,
-                  background: "conic-gradient(#2A6FDB 0% 42%, #F66B0A 42% 66%, #7C3AED 66% 80%, #E5484D 80% 92%, #5C667C 92% 100%)",
-                  display: "flex", alignItems: "center", justifyContent: "center", position: "relative", flexShrink: 0
-                }}>
-                  <div style={{ width: 80, height: 80, borderRadius: 999, background: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                    <span style={{ fontSize: 18, fontWeight: 700, color: "var(--ink)", fontFamily: "var(--display)" }}>{denuncias.length}</span>
-                    <span style={{ fontSize: 10, color: "var(--ink-muted)", textTransform: "uppercase" }}>Total</span>
+
+            {/* Left Chart: Denúncias por Tipo */}
+            <div className="card" style={{
+              background: "#FFFFFF",
+              borderRadius: 14,
+              padding: "24px 26px",
+              border: "1px solid #E2E8F0",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.03)"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <h3 style={{ fontSize: 15, fontWeight: 700, margin: 0, color: "#00204D" }}>
+                  Denúncias por Tipo
+                </h3>
+                <span style={{ color: "#94A3B8", cursor: "pointer", fontSize: 16 }}>⋮</span>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
+                {/* SVG Donut Chart */}
+                <div style={{ position: "relative", width: 140, height: 140, flexShrink: 0 }}>
+                  <svg width="140" height="140" viewBox="0 0 42 42">
+                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#E2E8F0" strokeWidth="5.5"/>
+                    {/* Blue segment: 42% */}
+                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#2563EB" strokeWidth="5.5" strokeDasharray="42 58" strokeDashoffset="25"/>
+                    {/* Orange segment: 24% */}
+                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#FF6A00" strokeWidth="5.5" strokeDasharray="24 76" strokeDashoffset="-17"/>
+                    {/* Purple segment: 14% */}
+                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#8B5CF6" strokeWidth="5.5" strokeDasharray="14 86" strokeDashoffset="-41"/>
+                    {/* Red segment: 12% */}
+                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#E11D48" strokeWidth="5.5" strokeDasharray="12 88" strokeDashoffset="-55"/>
+                    {/* Grey segment: 8% */}
+                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#64748B" strokeWidth="5.5" strokeDasharray="8 92" strokeDashoffset="-67"/>
+                  </svg>
+                  {/* Center Text */}
+                  <div style={{
+                    position: "absolute", inset: 0,
+                    display: "flex", flexDirection: "column",
+                    alignItems: "center", justifyContent: "center"
+                  }}>
+                    <span style={{ fontSize: 20, fontWeight: 800, color: "#00204D", lineHeight: 1 }}>{denuncias.length}</span>
+                    <span style={{ fontSize: 9.5, fontWeight: 700, color: "#94A3B8", textTransform: "uppercase", marginTop: 2 }}>TOTAL</span>
                   </div>
                 </div>
 
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8, fontSize: 12 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 10, height: 10, borderRadius: 2, background: "#2A6FDB" }} /> Assédio Moral</span>
-                    <strong>42%</strong>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 10, height: 10, borderRadius: 2, background: "#F66B0A" }} /> Assédio Sexual</span>
-                    <strong>24%</strong>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 10, height: 10, borderRadius: 2, background: "#7C3AED" }} /> Discriminação</span>
-                    <strong>14%</strong>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 10, height: 10, borderRadius: 2, background: "#E5484D" }} /> Violência Psicológica</span>
-                    <strong>12%</strong>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 10, height: 10, borderRadius: 2, background: "#5C667C" }} /> Outros</span>
-                    <strong>8%</strong>
-                  </div>
+                {/* Legend with Percentages */}
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 10 }}>
+                  {[
+                    { label: "Assédio Moral", pct: "42%", cor: "#2563EB" },
+                    { label: "Assédio Sexual", pct: "24%", cor: "#FF6A00" },
+                    { label: "Discriminação", pct: "14%", cor: "#8B5CF6" },
+                    { label: "Violência Psicológica", pct: "12%", cor: "#E11D48" },
+                    { label: "Outros", pct: "8%", cor: "#64748B" },
+                  ].map((item, idx) => (
+                    <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ width: 10, height: 10, borderRadius: 2.5, background: item.cor }} />
+                        <span style={{ color: "#334155", fontWeight: 500 }}>{item.label}</span>
+                      </div>
+                      <strong style={{ color: "#00204D" }}>{item.pct}</strong>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
 
-            {/* Line Chart Representation: Evolução */}
-            <div className="card" style={{ padding: "22px 24px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                <h3 style={{ fontSize: 15, fontWeight: 700, margin: 0, color: "var(--ink)" }}>
+            {/* Right Chart: Evolução das Denúncias */}
+            <div className="card" style={{
+              background: "#FFFFFF",
+              borderRadius: 14,
+              padding: "24px 26px",
+              border: "1px solid #E2E8F0",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.03)"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <h3 style={{ fontSize: 15, fontWeight: 700, margin: 0, color: "#00204D" }}>
                   Evolução das Denúncias
                 </h3>
-                <div style={{ display: "flex", gap: 12, fontSize: 11 }}>
-                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ width: 8, height: 8, borderRadius: 999, background: "#2A6FDB" }} /> 2026</span>
-                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ width: 8, height: 8, borderRadius: 999, background: "#22c55e" }} /> 2025</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 11.5 }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: 5, color: "#64748B" }}>
+                    <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#2563EB" }} /> 2026
+                  </span>
+                  <span style={{ display: "flex", alignItems: "center", gap: 5, color: "#64748B" }}>
+                    <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#22C55E" }} /> 2025
+                  </span>
+                  <span style={{ color: "#94A3B8", cursor: "pointer", fontSize: 16 }}>⋮</span>
                 </div>
               </div>
 
-              {/* Chart Visual Simulation */}
-              <div style={{ height: 140, display: "flex", alignItems: "flex-end", gap: 14, paddingTop: 10, borderBottom: "1px solid var(--border)" }}>
-                {[
-                  { m: "Jan", v1: 30, v2: 20 },
-                  { m: "Fev", v1: 45, v2: 30 },
-                  { m: "Mar", v1: 60, v2: 35 },
-                  { m: "Abr", v1: 50, v2: 38 },
-                  { m: "Mai", v1: 75, v2: 45 },
-                  { m: "Jun", v1: 90, v2: 50 },
-                ].map(item => (
-                  <div key={item.m} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, height: "100%", justifyContent: "flex-end" }}>
-                    <div style={{ width: "100%", display: "flex", justifyContent: "center", gap: 4, alignItems: "flex-end", height: "100%" }}>
-                      <div style={{ width: 10, background: "#2A6FDB", height: `${item.v1}%`, borderRadius: "3px 3px 0 0" }} title={`2026: ${item.v1}`} />
-                      <div style={{ width: 10, background: "#22c55e", height: `${item.v2}%`, borderRadius: "3px 3px 0 0" }} title={`2025: ${item.v2}`} />
+              {/* Bar Chart Grid with Y Axis */}
+              <div style={{ display: "flex", gap: 12, height: 140 }}>
+                {/* Y Axis Labels */}
+                <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", fontSize: 10, color: "#94A3B8", textAlign: "right", paddingRight: 4, height: "82%" }}>
+                  <span>8</span>
+                  <span>6</span>
+                  <span>4</span>
+                  <span>2</span>
+                  <span>0</span>
+                </div>
+
+                {/* Bars Area */}
+                <div style={{ flex: 1, display: "flex", justifyContent: "space-around", alignItems: "flex-end", borderBottom: "1px solid #E2E8F0", height: "82%", position: "relative" }}>
+                  {/* Subtle horizontal grid lines */}
+                  <div style={{ position: "absolute", left: 0, right: 0, top: "25%", borderTop: "1px dashed #F1F5F9", pointerEvents: "none" }} />
+                  <div style={{ position: "absolute", left: 0, right: 0, top: "50%", borderTop: "1px dashed #F1F5F9", pointerEvents: "none" }} />
+                  <div style={{ position: "absolute", left: 0, right: 0, top: "75%", borderTop: "1px dashed #F1F5F9", pointerEvents: "none" }} />
+
+                  {[
+                    { m: "Jan", v26: 48, v25: 35 },
+                    { m: "Fev", v26: 64, v25: 48 },
+                    { m: "Mar", v26: 80, v25: 50 },
+                    { m: "Abr", v26: 64, v25: 55 },
+                    { m: "Mai", v26: 90, v25: 64 },
+                    { m: "Jun", v26: 100, v25: 75 },
+                  ].map(col => (
+                    <div key={col.m} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, height: "100%", justifyContent: "flex-end", zIndex: 2 }}>
+                      <div style={{ display: "flex", gap: 4, alignItems: "flex-end", height: "100%" }}>
+                        <div style={{ width: 8, height: `${col.v26}%`, background: "#2563EB", borderRadius: "3px 3px 0 0" }} title={`2026: ${col.v26}%`} />
+                        <div style={{ width: 8, height: `${col.v25}%`, background: "#22C55E", borderRadius: "3px 3px 0 0" }} title={`2025: ${col.v25}%`} />
+                      </div>
+                      <span style={{ fontSize: 11, color: "#64748B", position: "relative", bottom: -20 }}>{col.m}</span>
                     </div>
-                    <span style={{ fontSize: 10, color: "var(--ink-muted)" }}>{item.m}</span>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
+
           </div>
 
-          {/* Casos em Andamento Table */}
-          <div className="card" style={{ padding: "22px 24px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: "var(--ink)" }}>
+          {/* 3. Casos em Andamento Table Card */}
+          <div className="card" style={{
+            background: "#FFFFFF",
+            borderRadius: 14,
+            padding: "24px 26px",
+            border: "1px solid #E2E8F0",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.03)"
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: "#00204D" }}>
                 Casos em Andamento
               </h3>
-              <button onClick={() => setActiveTab("casos")} className="btn btn-soft" style={{ height: 30, fontSize: 12 }}>
+              <button
+                onClick={() => setActiveTab("casos")}
+                style={{
+                  height: 32,
+                  padding: "0 14px",
+                  borderRadius: 999,
+                  background: "#F1F5F9",
+                  border: "1px solid #E2E8F0",
+                  color: "#0E2748",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  cursor: "pointer"
+                }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
                 Ver Todos os Casos
               </button>
             </div>
 
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+                <thead>
+                  <tr style={{ borderBottom: "1.5px solid #E2E8F0", textAlign: "left" }}>
+                    <th style={{ padding: "10px 8px", color: "#94A3B8", fontWeight: 700, fontSize: 11, letterSpacing: "0.04em" }}>CÓDIGO / PROTOCOLO</th>
+                    <th style={{ padding: "10px 8px", color: "#94A3B8", fontWeight: 700, fontSize: 11, letterSpacing: "0.04em" }}>TIPO / NATUREZA</th>
+                    <th style={{ padding: "10px 8px", color: "#94A3B8", fontWeight: 700, fontSize: 11, letterSpacing: "0.04em" }}>DATA DE ABERTURA</th>
+                    <th style={{ padding: "10px 8px", color: "#94A3B8", fontWeight: 700, fontSize: 11, letterSpacing: "0.04em" }}>STATUS</th>
+                    <th style={{ padding: "10px 8px", color: "#94A3B8", fontWeight: 700, fontSize: 11, letterSpacing: "0.04em" }}>RESPONSÁVEL</th>
+                    <th style={{ padding: "10px 8px", color: "#94A3B8", fontWeight: 700, fontSize: 11, letterSpacing: "0.04em" }}>PRAZO</th>
+                    <th style={{ padding: "10px 8px", color: "#94A3B8", fontWeight: 700, fontSize: 11, letterSpacing: "0.04em", textAlign: "right" }}>AÇÃO</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    {
+                      id: "den-1",
+                      protocolo: "DEN-2026-0001",
+                      natureza: "Assédio Moral",
+                      data: "15/06/2026",
+                      statusLabel: "Em Investigação",
+                      statusCor: "#F59E0B",
+                      statusBg: "#FEF3C7",
+                      responsavel: "Ana Paula (Compliance)",
+                      prazo: "14/07/2026"
+                    },
+                    {
+                      id: "den-2",
+                      protocolo: "DEN-2026-0002",
+                      natureza: "Sugestão de Melhoria",
+                      data: "01/07/2026",
+                      statusLabel: "Em Triagem",
+                      statusCor: "#2563EB",
+                      statusBg: "#DBEAFE",
+                      responsavel: "Ana Paula (Compliance)",
+                      prazo: "31/07/2026"
+                    },
+                    {
+                      id: "den-3",
+                      protocolo: "DEN-2026-0003",
+                      natureza: "Conflito de Interesses",
+                      data: "20/05/2026",
+                      statusLabel: "Concluído",
+                      statusCor: "#10B981",
+                      statusBg: "#D1FAE5",
+                      responsavel: "Ana Paula (Compliance)",
+                      prazo: "19/06/2026"
+                    },
+                    {
+                      id: "den-4",
+                      protocolo: "DEN-2026-0004",
+                      natureza: "Assédio Sexual",
+                      data: "05/08/2026",
+                      statusLabel: "Em Triagem",
+                      statusCor: "#2563EB",
+                      statusBg: "#DBEAFE",
+                      responsavel: "Ana Paula (Compliance)",
+                      prazo: "19/08/2026"
+                    }
+                  ].map((row, i) => (
+                    <tr key={row.id} style={{ borderBottom: "1px solid #F1F5F9" }}>
+                      <td style={{ padding: "14px 8px", fontWeight: 700, fontFamily: "var(--font-mono)", fontSize: 12.5, color: "#00204D" }}>
+                        {row.protocolo}
+                      </td>
+                      <td style={{ padding: "14px 8px", fontWeight: 600, color: "#0E2748" }}>
+                        {row.natureza}
+                      </td>
+                      <td style={{ padding: "14px 8px", color: "#64748B" }}>
+                        {row.data}
+                      </td>
+                      <td style={{ padding: "14px 8px" }}>
+                        <span style={{
+                          display: "inline-flex", alignItems: "center", gap: 6,
+                          fontSize: 11.5, fontWeight: 700, padding: "3px 10px", borderRadius: 999,
+                          background: row.statusBg, color: row.statusCor
+                        }}>
+                          <span style={{ width: 6, height: 6, borderRadius: "50%", background: row.statusCor }} />
+                          {row.statusLabel}
+                        </span>
+                      </td>
+                      <td style={{ padding: "14px 8px", color: "#334155" }}>
+                        {row.responsavel}
+                      </td>
+                      <td style={{ padding: "14px 8px", color: "#64748B" }}>
+                        {row.prazo}
+                      </td>
+                      <td style={{ padding: "14px 8px", textAlign: "right" }}>
+                        <button
+                          onClick={() => navigate("denuncia-detalhe", { id: row.id })}
+                          style={{
+                            height: 28,
+                            padding: "0 10px",
+                            borderRadius: 6,
+                            background: "#F8FAFC",
+                            border: "1px solid #CBD5E1",
+                            color: "#0E2748",
+                            fontSize: 11.5,
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 4
+                          }}
+                        >
+                          Tratar Caso ›
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* ─── TAB 2: CASOS ─── */}
+      {activeTab === "casos" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+            <div style={{ position: "relative", flex: "1 1 220px" }}>
+              <input
+                type="text"
+                placeholder="Buscar por protocolo, natureza ou relato..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                style={{ width: "100%", height: 38, padding: "0 10px 0 34px", borderRadius: 8, border: "1px solid #CBD5E1", fontSize: 13, background: "#fff", boxSizing: "border-box" }}
+              />
+              <div style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#94A3B8" }}>
+                <Icon name="search" size={15} />
+              </div>
+            </div>
+
+            <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ height: 38, padding: "0 12px", borderRadius: 8, border: "1px solid #CBD5E1", fontSize: 13, background: "#fff" }}>
+              <option value="todos">Todos os Status</option>
+              <option value="triagem">Em Triagem</option>
+              <option value="investigacao">Em Investigação</option>
+              <option value="concluido">Concluído</option>
+              <option value="arquivado">Arquivado</option>
+            </select>
+
+            <select value={filterGravidade} onChange={e => setFilterGravidade(e.target.value)} style={{ height: 38, padding: "0 12px", borderRadius: 8, border: "1px solid #CBD5E1", fontSize: 13, background: "#fff" }}>
+              <option value="todos">Todas as Gravidades</option>
+              <option value="baixa">Baixa</option>
+              <option value="media">Média</option>
+              <option value="alta">Alta</option>
+            </select>
+
+            <select value={filterTipo} onChange={e => setFilterTipo(e.target.value)} style={{ height: 38, padding: "0 12px", borderRadius: 8, border: "1px solid #CBD5E1", fontSize: 13, background: "#fff" }}>
+              <option value="todos">Todas as Naturezas</option>
+              {TIPOS_DENUNCIA.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
+            </select>
+          </div>
+
+          <div className="card" style={{ background: "#FFFFFF", borderRadius: 14, padding: "20px 24px", border: "1px solid #E2E8F0" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
-                <tr style={{ borderBottom: "2px solid var(--border)", textAlign: "left", color: "var(--ink-muted)" }}>
-                  <th style={{ padding: "8px 10px" }}>Código / Protocolo</th>
-                  <th style={{ padding: "8px 10px" }}>Tipo / Natureza</th>
-                  <th style={{ padding: "8px 10px" }}>Data</th>
-                  <th style={{ padding: "8px 10px" }}>Status</th>
-                  <th style={{ padding: "8px 10px" }}>Responsável</th>
-                  <th style={{ padding: "8px 10px" }}>Prazo</th>
-                  <th style={{ padding: "8px 10px", textAlign: "right" }}>Ação</th>
+                <tr style={{ borderBottom: "2px solid #E2E8F0", textAlign: "left", color: "#64748B" }}>
+                  <th style={{ padding: "10px" }}>1. Número do Protocolo</th>
+                  <th style={{ padding: "10px" }}>2. Data e Hora</th>
+                  <th style={{ padding: "10px" }}>3. Status Atual</th>
+                  <th style={{ padding: "10px" }}>4. Gravidade</th>
+                  <th style={{ padding: "10px" }}>5. Natureza / Categoria</th>
+                  <th style={{ padding: "10px" }}>6. Prazo Restante</th>
+                  <th style={{ padding: "10px", textAlign: "right" }}>Ações</th>
                 </tr>
               </thead>
               <tbody>
-                {denuncias.slice(0, 4).map(d => {
+                {filteredCasos.map(d => {
                   const st = DENUNCIA_STATUS[d.status];
+                  const gr = DENUNCIA_GRAVIDADE[d.gravidade];
+                  const dt = new Date(d.data);
+                  const prazoDt = new Date(d.prazoFinal);
+                  const diasRestantes = Math.max(0, Math.ceil((prazoDt - new Date()) / (1000 * 60 * 60 * 24)));
+
                   return (
-                    <tr key={d.id} style={{ borderBottom: "1px solid var(--border)" }}>
-                      <td style={{ padding: "10px", fontWeight: 700, fontFamily: "var(--font-mono)", fontSize: 12 }}>{d.protocolo}</td>
-                      <td style={{ padding: "10px", fontWeight: 600, color: "var(--ink)" }}>{d.natureza}</td>
-                      <td style={{ padding: "10px", color: "var(--ink-muted)", fontSize: 12 }}>{new Date(d.data).toLocaleDateString("pt-BR")}</td>
-                      <td style={{ padding: "10px" }}>
-                        <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 8px", borderRadius: 999, background: `${st?.cor}15`, color: st?.cor }}>
+                    <tr key={d.id} style={{ borderBottom: "1px solid #F1F5F9" }}>
+                      <td style={{ padding: "14px 10px", fontWeight: 700, fontFamily: "var(--font-mono)", fontSize: 12.5, color: "#00204D" }}>
+                        {d.protocolo}
+                      </td>
+                      <td style={{ padding: "14px 10px", color: "#64748B", fontSize: 12 }}>
+                        {dt.toLocaleDateString("pt-BR")} às {dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                      </td>
+                      <td style={{ padding: "14px 10px" }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 8px", borderRadius: 999, background: `${st?.cor}18`, color: st?.cor }}>
                           {st?.label}
                         </span>
                       </td>
-                      <td style={{ padding: "10px", color: "var(--ink-soft)" }}>Ana Paula (Compliance)</td>
-                      <td style={{ padding: "10px", color: "var(--ink-muted)", fontSize: 12 }}>{new Date(d.prazoFinal).toLocaleDateString("pt-BR")}</td>
-                      <td style={{ padding: "10px", textAlign: "right" }}>
+                      <td style={{ padding: "14px 10px" }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 8px", borderRadius: 999, background: `${gr?.cor}18`, color: gr?.cor }}>
+                          {gr?.label}
+                        </span>
+                      </td>
+                      <td style={{ padding: "14px 10px", fontWeight: 600, color: "#0E2748" }}>
+                        {d.natureza}
+                      </td>
+                      <td style={{ padding: "14px 10px", color: diasRestantes < 5 ? "#E11D48" : "#64748B", fontWeight: diasRestantes < 5 ? 700 : 400, fontSize: 12 }}>
+                        {diasRestantes} dias restantes
+                      </td>
+                      <td style={{ padding: "14px 10px", textAlign: "right" }}>
                         <button
                           onClick={() => navigate("denuncia-detalhe", { id: d.id })}
-                          className="btn btn-soft"
-                          style={{ height: 28, fontSize: 12, padding: "0 8px" }}
+                          style={{
+                            height: 30, padding: "0 12px", borderRadius: 6,
+                            background: "#00204D", color: "#fff", border: "none",
+                            fontWeight: 600, fontSize: 12, cursor: "pointer"
+                          }}
                         >
-                          Tratar Caso
+                          Ver Detalhes ›
                         </button>
                       </td>
                     </tr>
@@ -285,127 +821,10 @@ const DenunciasScreen = ({ navigate }) => {
         </div>
       )}
 
-      {/* ─── TAB 2: CASOS (Lista Geral de Manifestações) ─── */}
-      {activeTab === "casos" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          {/* Filters Bar */}
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-            <div style={{ position: "relative", flex: "1 1 200px" }}>
-              <input
-                type="text"
-                placeholder="Buscar por protocolo, natureza ou relato..."
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                style={{ width: "100%", height: 36, padding: "0 10px 0 32px", borderRadius: "var(--r-md)", border: "1px solid var(--border)", fontSize: 12.5, background: "#fff" }}
-              />
-              <div style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "var(--ink-faint)" }}>
-                <Icon name="search" size={14} />
-              </div>
-            </div>
-
-            <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ height: 36, padding: "0 10px", borderRadius: "var(--r-md)", border: "1px solid var(--border)", fontSize: 12.5, background: "#fff" }}>
-              <option value="todos">Todos os Status</option>
-              <option value="triagem">Em Triagem</option>
-              <option value="investigacao">Em Investigação</option>
-              <option value="concluido">Concluído</option>
-              <option value="arquivado">Arquivado</option>
-            </select>
-
-            <select value={filterGravidade} onChange={e => setFilterGravidade(e.target.value)} style={{ height: 36, padding: "0 10px", borderRadius: "var(--r-md)", border: "1px solid var(--border)", fontSize: 12.5, background: "#fff" }}>
-              <option value="todos">Todas as Gravidades</option>
-              <option value="baixa">Baixa</option>
-              <option value="media">Média</option>
-              <option value="alta">Alta</option>
-            </select>
-
-            <select value={filterTipo} onChange={e => setFilterTipo(e.target.value)} style={{ height: 36, padding: "0 10px", borderRadius: "var(--r-md)", border: "1px solid var(--border)", fontSize: 12.5, background: "#fff" }}>
-              <option value="todos">Todas as Naturezas</option>
-              {TIPOS_DENUNCIA.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
-            </select>
-
-            <select value={filterCliente} onChange={e => setFilterCliente(e.target.value)} style={{ height: 36, padding: "0 10px", borderRadius: "var(--r-md)", border: "1px solid var(--border)", fontSize: 12.5, background: "#fff" }}>
-              <option value="todos">Todas as Empresas</option>
-              {CLIENTES.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-          </div>
-
-          {/* Cases Table with exact 6 required fields */}
-          <div className="card" style={{ padding: "18px 20px" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-              <thead>
-                <tr style={{ borderBottom: "2px solid var(--border)", textAlign: "left", color: "var(--ink-muted)" }}>
-                  <th style={{ padding: "10px" }}>1. Número do Protocolo</th>
-                  <th style={{ padding: "10px" }}>2. Data e Hora</th>
-                  <th style={{ padding: "10px" }}>3. Status Atual</th>
-                  <th style={{ padding: "10px" }}>4. Gravidade</th>
-                  <th style={{ padding: "10px" }}>5. Natureza / Categoria</th>
-                  <th style={{ padding: "10px" }}>6. Prazo Restante</th>
-                  <th style={{ padding: "10px", textAlign: "right" }}>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredCasos.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} style={{ padding: "30px", textAlign: "center", color: "var(--ink-muted)" }}>
-                      Nenhum caso encontrado para os filtros selecionados.
-                    </td>
-                  </tr>
-                ) : (
-                  filteredCasos.map(d => {
-                    const st = DENUNCIA_STATUS[d.status];
-                    const gr = DENUNCIA_GRAVIDADE[d.gravidade];
-                    const dt = new Date(d.data);
-                    const prazoDt = new Date(d.prazoFinal);
-                    const diasRestantes = Math.max(0, Math.ceil((prazoDt - new Date()) / (1000 * 60 * 60 * 24)));
-
-                    return (
-                      <tr key={d.id} style={{ borderBottom: "1px solid var(--border)" }}>
-                        <td style={{ padding: "12px 10px", fontWeight: 700, fontFamily: "var(--font-mono)", fontSize: 12.5, color: "var(--ink)" }}>
-                          {d.protocolo}
-                        </td>
-                        <td style={{ padding: "12px 10px", color: "var(--ink-muted)", fontSize: 12 }}>
-                          {dt.toLocaleDateString("pt-BR")} às {dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                        </td>
-                        <td style={{ padding: "12px 10px" }}>
-                          <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 8px", borderRadius: 999, background: `${st?.cor}15`, color: st?.cor }}>
-                            {st?.label}
-                          </span>
-                        </td>
-                        <td style={{ padding: "12px 10px" }}>
-                          <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 8px", borderRadius: 999, background: `${gr?.cor}15`, color: gr?.cor }}>
-                            {gr?.label}
-                          </span>
-                        </td>
-                        <td style={{ padding: "12px 10px", fontWeight: 600, color: "var(--ink)" }}>
-                          {d.natureza}
-                        </td>
-                        <td style={{ padding: "12px 10px", color: diasRestantes < 5 ? "var(--coral)" : "var(--ink-muted)", fontWeight: diasRestantes < 5 ? 700 : 400, fontSize: 12 }}>
-                          {diasRestantes} dias restantes
-                        </td>
-                        <td style={{ padding: "12px 10px", textAlign: "right" }}>
-                          <button
-                            onClick={() => navigate("denuncia-detalhe", { id: d.id })}
-                            className="btn btn-primary"
-                            style={{ height: 30, fontSize: 12, padding: "0 12px" }}
-                          >
-                            Ver Detalhes <Icon name="chevron-right" size={13} />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
       {/* ─── TAB 3: GOVERNANÇA ─── */}
       {activeTab === "governanca" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          {/* Sub-tabs Governança */}
-          <div style={{ display: "flex", gap: 6, background: "var(--surface-2)", padding: 4, borderRadius: "var(--r-md)", width: "fit-content" }}>
+          <div style={{ display: "flex", gap: 6, background: "#F1F5F9", padding: 4, borderRadius: 8, width: "fit-content" }}>
             {[
               { id: "membros", label: "Convite Membros" },
               { id: "comites", label: "Comitês" },
@@ -418,10 +837,10 @@ const DenunciasScreen = ({ navigate }) => {
                 style={{
                   padding: "6px 14px", borderRadius: 6,
                   background: govTab === sub.id ? "#fff" : "transparent",
-                  color: govTab === sub.id ? "var(--ink)" : "var(--ink-muted)",
+                  color: govTab === sub.id ? "#00204D" : "#64748B",
                   fontWeight: govTab === sub.id ? 700 : 500, fontSize: 12.5,
-                  border: govTab === sub.id ? "1px solid var(--border)" : "none",
-                  cursor: "pointer", boxShadow: govTab === sub.id ? "var(--shadow-card)" : "none"
+                  border: "none", cursor: "pointer",
+                  boxShadow: govTab === sub.id ? "0 1px 3px rgba(0,0,0,0.06)" : "none"
                 }}
               >
                 {sub.label}
@@ -429,22 +848,21 @@ const DenunciasScreen = ({ navigate }) => {
             ))}
           </div>
 
-          {/* Sub 1: Membros */}
           {govTab === "membros" && (
-            <div className="card" style={{ padding: "24px" }}>
+            <div className="card" style={{ background: "#fff", padding: "24px", borderRadius: 14, border: "1px solid #E2E8F0" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
                 <div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: "var(--ink)" }}>Membros de Governança e Comitês</h3>
-                  <p style={{ margin: "4px 0 0", fontSize: 12.5, color: "var(--ink-muted)" }}>Usuários autorizados a receber, triar e investigar manifestações com sigilo legal.</p>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: "#00204D" }}>Membros de Governança e Comitês</h3>
+                  <p style={{ margin: "4px 0 0", fontSize: 12.5, color: "#64748B" }}>Usuários autorizados a receber, triar e investigar manifestações com sigilo legal.</p>
                 </div>
-                <button className="btn btn-primary" style={{ height: 34, fontSize: 12.5 }}>
-                  <Icon name="plus" size={14} /> Convidar Novo Membro
+                <button style={{ height: 34, padding: "0 14px", borderRadius: 6, background: "#FF6A00", color: "#fff", border: "none", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>
+                  + Convidar Novo Membro
                 </button>
               </div>
 
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                 <thead>
-                  <tr style={{ borderBottom: "2px solid var(--border)", textAlign: "left", color: "var(--ink-muted)" }}>
+                  <tr style={{ borderBottom: "1.5px solid #E2E8F0", textAlign: "left", color: "#94A3B8" }}>
                     <th style={{ padding: "8px 10px" }}>Nome</th>
                     <th style={{ padding: "8px 10px" }}>Email</th>
                     <th style={{ padding: "8px 10px" }}>Comitê</th>
@@ -459,13 +877,13 @@ const DenunciasScreen = ({ navigate }) => {
                     { nome: "Dr. Carlos Mendes", email: "juridico@loghaus.com.br", comite: "Comitê de Ética", papel: "Assessor Jurídico", status: "Ativo" },
                     { nome: "Roberto Lima", email: "roberto@vitamed.com.br", comite: "Comitê de Integridade", papel: "Membro", status: "Ativo" },
                   ].map((m, idx) => (
-                    <tr key={idx} style={{ borderBottom: "1px solid var(--border)" }}>
-                      <td style={{ padding: "10px", fontWeight: 600, color: "var(--ink)" }}>{m.nome}</td>
-                      <td style={{ padding: "10px", color: "var(--ink-muted)" }}>{m.email}</td>
-                      <td style={{ padding: "10px", color: "var(--ink-soft)" }}>{m.comite}</td>
-                      <td style={{ padding: "10px", color: "var(--ink-soft)" }}>{m.papel}</td>
-                      <td style={{ padding: "10px" }}>
-                        <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 999, background: "var(--health-soft)", color: "var(--health-deep)" }}>
+                    <tr key={idx} style={{ borderBottom: "1px solid #F1F5F9" }}>
+                      <td style={{ padding: "12px 10px", fontWeight: 600, color: "#00204D" }}>{m.nome}</td>
+                      <td style={{ padding: "12px 10px", color: "#64748B" }}>{m.email}</td>
+                      <td style={{ padding: "12px 10px", color: "#334155" }}>{m.comite}</td>
+                      <td style={{ padding: "12px 10px", color: "#334155" }}>{m.papel}</td>
+                      <td style={{ padding: "12px 10px" }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 8px", borderRadius: 999, background: "#D1FAE5", color: "#10B981" }}>
                           {m.status}
                         </span>
                       </td>
@@ -476,33 +894,20 @@ const DenunciasScreen = ({ navigate }) => {
             </div>
           )}
 
-          {/* Sub 2: Comitês */}
           {govTab === "comites" && (
-            <div className="card" style={{ padding: "24px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-                <div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: "var(--ink)" }}>Comitês de Ética e Compliance</h3>
-                  <p style={{ margin: "4px 0 0", fontSize: 12.5, color: "var(--ink-muted)" }}>Estruturas colegiadas responsáveis pelo julgamento e deliberação dos casos.</p>
-                </div>
-                <button className="btn btn-primary" style={{ height: 34, fontSize: 12.5 }}>
-                  <Icon name="plus" size={14} /> Criar Comitê
-                </button>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
+            <div className="card" style={{ background: "#fff", padding: "24px", borderRadius: 14, border: "1px solid #E2E8F0" }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 14px", color: "#00204D" }}>Comitês Ativos</h3>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                 {GOVERNANCA_COMITES.map(com => (
-                  <div key={com.id} style={{ padding: "16px 18px", border: "1px solid var(--border)", borderRadius: "var(--r-md)", background: "var(--surface-2)" }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>{com.nome}</div>
-                    <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 4 }}>Empresa vinculada: {CLIENTES.find(c => c.id === com.clienteId)?.name || com.clienteId}</div>
-                    <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid var(--border)" }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--ink-faint)", marginBottom: 6 }}>Membros Integrantes:</div>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                        {com.membros.map((mb, i) => (
-                          <span key={i} style={{ fontSize: 11.5, padding: "3px 8px", borderRadius: 6, background: "#fff", border: "1px solid var(--border)", color: "var(--ink-soft)" }}>
-                            {mb}
-                          </span>
-                        ))}
-                      </div>
+                  <div key={com.id} style={{ padding: "16px 18px", border: "1px solid #E2E8F0", borderRadius: 10, background: "#F8FAFC" }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#00204D" }}>{com.nome}</div>
+                    <div style={{ fontSize: 12, color: "#64748B", marginTop: 4 }}>Empresa: {CLIENTES.find(c => c.id === com.clienteId)?.name || com.clienteId}</div>
+                    <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 6 }}>
+                      {com.membros.map((mb, i) => (
+                        <span key={i} style={{ fontSize: 11.5, padding: "3px 8px", borderRadius: 6, background: "#fff", border: "1px solid #CBD5E1", color: "#334155" }}>
+                          {mb}
+                        </span>
+                      ))}
                     </div>
                   </div>
                 ))}
@@ -510,100 +915,50 @@ const DenunciasScreen = ({ navigate }) => {
             </div>
           )}
 
-          {/* Sub 3: Auditoria & 4 Tipos de Relatórios */}
           {govTab === "auditoria" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-              {/* 4 Compliance Reports Cards */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
-                <div className="card" style={{ padding: "18px 20px", borderLeft: "4px solid var(--sky)" }}>
-                  <h4 style={{ margin: "0 0 6px", fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>1. Relatórios de Auditoria (Trilha)</h4>
-                  <p style={{ margin: 0, fontSize: 12, color: "var(--ink-muted)", lineHeight: 1.4 }}>
-                    Registro inalterável de todos os acessos e ações por caso. Prova de diligência e conformidade legal.
-                  </p>
-                </div>
-                <div className="card" style={{ padding: "18px 20px", borderLeft: "4px solid var(--health)" }}>
-                  <h4 style={{ margin: "0 0 6px", fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>2. Relatórios de Acompanhamento Semestral</h4>
-                  <p style={{ margin: 0, fontSize: 12, color: "var(--ink-muted)", lineHeight: 1.4 }}>
-                    Consolidado semestral (30/jun e 31/dez) para Diretoria e Conselho. Arquivado por 5 anos para reguladores.
-                  </p>
-                </div>
-                <div className="card" style={{ padding: "18px 20px", borderLeft: "4px solid var(--warning)" }}>
-                  <h4 style={{ margin: "0 0 6px", fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>3. Relatórios de Apuração (Investigação)</h4>
-                  <p style={{ margin: 0, fontSize: 12, color: "var(--ink-muted)", lineHeight: 1.4 }}>
-                    Resultado conclusivo (procedente/improcedente) com medidas recomendadas e encaminhamento executivo.
-                  </p>
-                </div>
-                <div className="card" style={{ padding: "18px 20px", borderLeft: "4px solid var(--accent)" }}>
-                  <h4 style={{ margin: "0 0 6px", fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>4. Transparência para Stakeholders</h4>
-                  <p style={{ margin: 0, fontSize: 12, color: "var(--ink-muted)", lineHeight: 1.4 }}>
-                    Estatísticas e KPIs agregados para assegurar a seriedade e fortalecer a cultura de integridade.
-                  </p>
-                </div>
-              </div>
-
-              {/* General Audit Logs Table */}
-              <div className="card" style={{ padding: "22px 24px" }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 14px", color: "var(--ink)" }}>
-                  Trilha Geral de Auditoria (Logs de Acesso e Alterações)
-                </h3>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
-                  <thead>
-                    <tr style={{ borderBottom: "2px solid var(--border)", textAlign: "left", color: "var(--ink-muted)" }}>
-                      <th style={{ padding: "8px 10px" }}>Data / Hora</th>
-                      <th style={{ padding: "8px 10px" }}>Usuário / Agente</th>
-                      <th style={{ padding: "8px 10px" }}>Ação Registrada</th>
-                      <th style={{ padding: "8px 10px" }}>Protocolo / Caso</th>
-                      <th style={{ padding: "8px 10px" }}>Integridade</th>
+            <div className="card" style={{ background: "#fff", padding: "24px", borderRadius: 14, border: "1px solid #E2E8F0" }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 14px", color: "#00204D" }}>Logs e Trilha de Auditoria</h3>
+              <p style={{ margin: "0 0 16px", fontSize: 12.5, color: "#64748B" }}>Todos os acessos a denúncias possuem hash criptográfico inalterável conforme a Lei 14.457/2022.</p>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+                <thead>
+                  <tr style={{ borderBottom: "1.5px solid #E2E8F0", textAlign: "left", color: "#94A3B8" }}>
+                    <th style={{ padding: "8px 10px" }}>Data / Hora</th>
+                    <th style={{ padding: "8px 10px" }}>Usuário</th>
+                    <th style={{ padding: "8px 10px" }}>Ação Registrada</th>
+                    <th style={{ padding: "8px 10px" }}>Caso</th>
+                    <th style={{ padding: "8px 10px" }}>Integridade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { data: "2026-06-20 10:30", user: "Ana Paula Rios", acao: "Andamento registrado: Investigação iniciada", caso: "DEN-2026-0001", hash: "SHA256:8f2a...e91" },
+                    { data: "2026-06-18 11:00", user: "Ana Paula Rios", acao: "Mensagem enviada via chat sigiloso", caso: "DEN-2026-0001", hash: "SHA256:4b1c...d82" },
+                    { data: "2026-06-16 14:00", user: "Ana Paula Rios", acao: "Status alterado para: Em Investigação", caso: "DEN-2026-0001", hash: "SHA256:1a9f...c33" },
+                  ].map((l, i) => (
+                    <tr key={i} style={{ borderBottom: "1px solid #F1F5F9" }}>
+                      <td style={{ padding: "10px", color: "#64748B" }}>{l.data}</td>
+                      <td style={{ padding: "10px", fontWeight: 600, color: "#00204D" }}>{l.user}</td>
+                      <td style={{ padding: "10px", color: "#334155" }}>{l.acao}</td>
+                      <td style={{ padding: "10px", fontFamily: "var(--font-mono)", fontSize: 11.5 }}>{l.caso}</td>
+                      <td style={{ padding: "10px", color: "#16A34A", fontFamily: "var(--font-mono)", fontSize: 11 }}>✓ {l.hash}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      { data: "2026-06-20 10:30", user: "Ana Paula Rios", acao: "Andamento registrado: Investigação iniciada", caso: "DEN-2026-0001", hash: "SHA256:8f2a...e91" },
-                      { data: "2026-06-18 11:00", user: "Ana Paula Rios", acao: "Mensagem enviada via chat sigiloso", caso: "DEN-2026-0001", hash: "SHA256:4b1c...d82" },
-                      { data: "2026-06-16 14:00", user: "Ana Paula Rios", acao: "Status alterado para: Em Investigação", caso: "DEN-2026-0001", hash: "SHA256:1a9f...c33" },
-                      { data: "2026-06-15 09:23", user: "Sistema (Portal)", acao: "Novo relato recebido anonimamente", caso: "DEN-2026-0001", hash: "SHA256:7c3e...a12" },
-                      { data: "2026-06-10 14:00", user: "Ana Paula Rios", acao: "Parecer final registrado: Procedente", caso: "DEN-2026-0003", hash: "SHA256:2d8a...b74" },
-                    ].map((log, i) => (
-                      <tr key={i} style={{ borderBottom: "1px solid var(--border)" }}>
-                        <td style={{ padding: "10px", color: "var(--ink-muted)" }}>{log.data}</td>
-                        <td style={{ padding: "10px", fontWeight: 600, color: "var(--ink)" }}>{log.user}</td>
-                        <td style={{ padding: "10px", color: "var(--ink-soft)" }}>{log.acao}</td>
-                        <td style={{ padding: "10px", fontFamily: "var(--font-mono)", fontSize: 11.5 }}>{log.caso}</td>
-                        <td style={{ padding: "10px", color: "var(--health-deep)", fontFamily: "var(--font-mono)", fontSize: 11 }}>
-                          ✓ {log.hash}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
 
-          {/* Sub 4: Políticas */}
           {govTab === "politicas" && (
-            <div className="card" style={{ padding: "24px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-                <div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: "var(--ink)" }}>Políticas Institucionais e Manuais</h3>
-                  <p style={{ margin: "4px 0 0", fontSize: 12.5, color: "var(--ink-muted)" }}>Documentos normativos que regem a conduta, apuração e proteção contra retaliações.</p>
-                </div>
-                <button className="btn btn-primary" style={{ height: 34, fontSize: 12.5 }}>
-                  <Icon name="plus" size={14} /> Publicar Política
-                </button>
-              </div>
-
+            <div className="card" style={{ background: "#fff", padding: "24px", borderRadius: 14, border: "1px solid #E2E8F0" }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 14px", color: "#00204D" }}>Políticas e Código de Conduta</h3>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {GOVERNANCA_POLITICAS.map(pol => (
-                  <div key={pol.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", border: "1px solid var(--border)", borderRadius: "var(--r-md)", background: "var(--surface-2)" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                      <Icon name="file-text" size={20} color="var(--accent)" />
-                      <div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>{pol.titulo}</div>
-                        <div style={{ fontSize: 12, color: "var(--ink-muted)" }}>Versão {pol.versao} · Publicada em {pol.dataPublicacao}</div>
-                      </div>
+                  <div key={pol.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", border: "1px solid #E2E8F0", borderRadius: 8, background: "#F8FAFC" }}>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "#00204D" }}>{pol.titulo}</div>
+                      <div style={{ fontSize: 12, color: "#64748B" }}>Versão {pol.versao} · {pol.dataPublicacao}</div>
                     </div>
-                    <button className="btn btn-soft" style={{ height: 30, fontSize: 12 }}>
+                    <button style={{ height: 28, padding: "0 12px", borderRadius: 6, background: "#fff", border: "1px solid #CBD5E1", fontSize: 12, cursor: "pointer" }}>
                       Visualizar
                     </button>
                   </div>
@@ -617,14 +972,12 @@ const DenunciasScreen = ({ navigate }) => {
       {/* ─── TAB 4: GESTÃO & CONFIGURAÇÕES ─── */}
       {activeTab === "gestao" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          {/* Sub-tabs Gestão */}
-          <div style={{ display: "flex", gap: 6, background: "var(--surface-2)", padding: 4, borderRadius: "var(--r-md)", width: "fit-content" }}>
+          <div style={{ display: "flex", gap: 6, background: "#F1F5F9", padding: 4, borderRadius: 8, width: "fit-content" }}>
             {[
               { id: "tipos", label: "Tipos de Denúncias" },
               { id: "documentos", label: "Documentos" },
               { id: "treinamentos", label: "Treinamentos" },
               { id: "perfil", label: "Perfil & Acessos" },
-              { id: "ajuda", label: "Central de Ajuda" },
             ].map(sub => (
               <button
                 key={sub.id}
@@ -632,10 +985,9 @@ const DenunciasScreen = ({ navigate }) => {
                 style={{
                   padding: "6px 14px", borderRadius: 6,
                   background: gestaoTab === sub.id ? "#fff" : "transparent",
-                  color: gestaoTab === sub.id ? "var(--ink)" : "var(--ink-muted)",
+                  color: gestaoTab === sub.id ? "#00204D" : "#64748B",
                   fontWeight: gestaoTab === sub.id ? 700 : 500, fontSize: 12.5,
-                  border: gestaoTab === sub.id ? "1px solid var(--border)" : "none",
-                  cursor: "pointer", boxShadow: gestaoTab === sub.id ? "var(--shadow-card)" : "none"
+                  border: "none", cursor: "pointer"
                 }}
               >
                 {sub.label}
@@ -643,139 +995,13 @@ const DenunciasScreen = ({ navigate }) => {
             ))}
           </div>
 
-          {/* Sub: Tipos de Denúncias */}
-          {gestaoTab === "tipos" && (
-            <div className="card" style={{ padding: "24px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-                <div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: "var(--ink)" }}>Categorias e Tipos de Relato</h3>
-                  <p style={{ margin: "4px 0 0", fontSize: 12.5, color: "var(--ink-muted)" }}>Opções apresentadas aos colaboradores no portal público de denúncias.</p>
-                </div>
-                <button className="btn btn-primary" style={{ height: 34, fontSize: 12.5 }}>
-                  <Icon name="plus" size={14} /> Novo Tipo
-                </button>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
-                {TIPOS_DENUNCIA.map(tipo => (
-                  <div key={tipo.id} style={{ padding: "14px 16px", borderRadius: "var(--r-md)", border: "1px solid var(--border)", background: "var(--surface-2)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <span style={{ width: 10, height: 10, borderRadius: 999, background: tipo.cor }} />
-                      <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--ink)" }}>{tipo.nome}</span>
-                    </div>
-                    <button className="btn btn-soft" style={{ height: 26, fontSize: 11, padding: "0 8px" }}>
-                      Editar
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Sub: Documentos & Materiais de Apoio */}
-          {gestaoTab === "documentos" && (
-            <div className="card" style={{ padding: "24px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-                <div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: "var(--ink)" }}>Materiais de Apoio ao Denunciante</h3>
-                  <p style={{ margin: "4px 0 0", fontSize: 12.5, color: "var(--ink-muted)" }}>Cartilhas e orientações disponíveis no portal do denunciante.</p>
-                </div>
-                <button className="btn btn-primary" style={{ height: 34, fontSize: 12.5 }}>
-                  <Icon name="plus" size={14} /> Adicionar Material
-                </button>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {[
-                  "CARTILHA - COMBATE A AGRESSÃO FÍSICA",
-                  "CARTILHA - PREVENÇÃO E COMBATE AO ASSÉDIO MORAL",
-                  "CARTILHA - PREVENÇÃO E COMBATE AO ASSÉDIO SEXUAL",
-                  "CARTILHA - ASSÉDIO ELEITORAL NO TRABALHO",
-                  "CARTILHA - COMBATE À CORRUPÇÃO",
-                  "CARTILHA - EVITANDO O DESVIO DE ATIVOS",
-                ].map((cart, idx) => (
-                  <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", border: "1px solid var(--border)", borderRadius: 6, background: "var(--surface-2)" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "var(--ink-soft)" }}>
-                      <Icon name="file" size={16} color="var(--accent)" />
-                      <span>{cart}</span>
-                    </div>
-                    <span style={{ fontSize: 11, color: "var(--health-deep)", fontWeight: 600 }}>Ativo no portal</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Sub: Treinamentos */}
-          {gestaoTab === "treinamentos" && (
-            <div className="card" style={{ padding: "24px" }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 14px", color: "var(--ink)" }}>Treinamentos Obrigatórios Vinculados</h3>
-              <p style={{ margin: "0 0 16px", fontSize: 13, color: "var(--ink-muted)" }}>
-                Conforme a Lei 14.457/2022, as empresas devem realizar treinamentos anuais sobre prevenção ao assédio e temas de integridade.
-              </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <div style={{ padding: "14px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface-2)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: 14, color: "var(--ink)" }}>Treinamento: Prevenção e Combate ao Assédio no Ambiente de Trabalho</div>
-                    <div style={{ fontSize: 12, color: "var(--ink-muted)" }}>Carga horária: 2h · Adesão atual: 92% dos colaboradores</div>
-                  </div>
-                  <button className="btn btn-soft" style={{ height: 30, fontSize: 12 }}>Ver Detalhes</button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Sub: Perfil e Acessos */}
-          {gestaoTab === "perfil" && (
-            <div className="card" style={{ padding: "24px" }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 14px", color: "var(--ink)" }}>Configuração do Portal e Sigilo</h3>
-              <div style={{ display: "flex", flexDirection: "column", gap: 14, maxWidth: 600 }}>
-                <div>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--ink-soft)", marginBottom: 4 }}>Mensagem Institucional do Canal (Texto Livre)</label>
-                  <textarea
-                    rows={3}
-                    defaultValue="Este é um canal independente, privado e sigiloso, mantido por uma empresa externa à nossa, para compartilhamento das diretrizes de ética, recebimento de denúncias e sugestões de melhorias."
-                    style={{ width: "100%", padding: "8px 10px", borderRadius: 6, border: "1px solid var(--border)", fontSize: 12.5 }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--ink-soft)", cursor: "pointer" }}>
-                    <input type="checkbox" defaultChecked />
-                    <span>Remoção automática de metadados de fotos e documentos anexados</span>
-                  </label>
-                </div>
-                <div>
-                  <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--ink-soft)", cursor: "pointer" }}>
-                    <input type="checkbox" defaultChecked />
-                    <span>Não rastreamento de endereço IP e geolocalização do denunciante</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Sub: Central de Ajuda */}
-          {gestaoTab === "ajuda" && (
-            <div className="card" style={{ padding: "24px" }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 14px", color: "var(--ink)" }}>Central de Ajuda e Diretrizes Operacionais</h3>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12, fontSize: 13, color: "var(--ink-soft)", lineHeight: 1.5 }}>
-                <div style={{ padding: "12px 14px", background: "var(--surface-2)", borderRadius: 6 }}>
-                  <strong>Como funciona o juízo de admissibilidade?</strong>
-                  <p style={{ margin: "4px 0 0", color: "var(--ink-muted)", fontSize: 12.5 }}>
-                    O analista deve verificar se o relato contém indícios mínimos de autoria e materialidade antes de iniciar a fase formal de apuração.
-                  </p>
-                </div>
-                <div style={{ padding: "12px 14px", background: "var(--surface-2)", borderRadius: 6 }}>
-                  <strong>Quais são os prazos recomendados para resposta?</strong>
-                  <p style={{ margin: "4px 0 0", color: "var(--ink-muted)", fontSize: 12.5 }}>
-                    Triagem inicial em até 48 horas. Conclusão da investigação em até 30 dias, prorrogável justificadamente.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
+          <div className="card" style={{ background: "#fff", padding: "24px", borderRadius: 14, border: "1px solid #E2E8F0" }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 14px", color: "#00204D" }}>Configurações de Integridade & Compliance</h3>
+            <p style={{ fontSize: 13, color: "#64748B" }}>Parâmetros ativos de anonimização e conformidade com a NR-01 e Lei 14.457/2022.</p>
+          </div>
         </div>
       )}
+
     </Page>
   );
 };

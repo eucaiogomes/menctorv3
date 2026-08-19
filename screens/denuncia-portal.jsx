@@ -153,34 +153,34 @@ const DenunciaPortalPage = ({ navigate }) => {
       <header style={{
         background: "#FFFFFF",
         borderBottom: "1px solid #E2E8F0",
-        padding: "14px 32px",
+        padding: "16px 40px",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
         boxShadow: "0 1px 3px rgba(0,0,0,0.03)"
       }}>
         {/* Brand Logo / Title */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <div style={{
-            width: 38,
-            height: 38,
+            width: 40,
+            height: 40,
             borderRadius: 10,
             background: "linear-gradient(135deg, #FF6A00, #F66B0A)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            boxShadow: "0 4px 10px rgba(246,107,10,0.25)"
+            boxShadow: "0 4px 12px rgba(246,107,10,0.25)"
           }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
               <path d="M9 12l2 2 4-4"/>
             </svg>
           </div>
           <div>
-            <div style={{ fontSize: 16.5, fontWeight: 700, color: "#00204D", lineHeight: 1.2 }}>
+            <div style={{ fontSize: 17, fontWeight: 700, color: "#00204D", lineHeight: 1.2 }}>
               Canal de Denúncias e Escuta
             </div>
-            <div style={{ fontSize: 11.5, color: "#64748B", fontWeight: 500 }}>
+            <div style={{ fontSize: 12, color: "#64748B", fontWeight: 500 }}>
               Plataforma Independente de Integridade & Compliance
             </div>
           </div>
@@ -190,17 +190,17 @@ const DenunciaPortalPage = ({ navigate }) => {
         <button
           onClick={() => navigate("denuncias")}
           style={{
-            height: 36,
-            padding: "0 16px",
+            height: 38,
+            padding: "0 18px",
             borderRadius: 8,
             background: "#FFFFFF",
             border: "1px solid #CBD5E1",
             color: "#0E2748",
-            fontSize: 12.5,
+            fontSize: 13,
             fontWeight: 600,
             display: "flex",
             alignItems: "center",
-            gap: 7,
+            gap: 8,
             cursor: "pointer",
             transition: "all .15s ease",
             boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
@@ -208,7 +208,7 @@ const DenunciaPortalPage = ({ navigate }) => {
           onMouseEnter={e => { e.currentTarget.style.borderColor = "#94A3B8"; e.currentTarget.style.background = "#F8FAFC"; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = "#CBD5E1"; e.currentTarget.style.background = "#FFFFFF"; }}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0E2748" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0E2748" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
           </svg>
@@ -216,19 +216,19 @@ const DenunciaPortalPage = ({ navigate }) => {
         </button>
       </header>
 
-      {/* ─── MAIN CONTENT CONTAINER (Aligned to Window with max-width) ─── */}
+      {/* ─── MAIN CONTENT CONTAINER (Full Width / Fluid Window Alignment) ─── */}
       <main style={{
-        maxWidth: 1360,
         width: "100%",
+        maxWidth: 1680,
         margin: "0 auto",
-        padding: "24px 32px 32px",
+        padding: "24px 40px 36px",
         boxSizing: "border-box",
         flex: 1
       }}>
         <div style={{
           display: "grid",
-          gridTemplateColumns: "1fr 360px",
-          gap: 24,
+          gridTemplateColumns: "1fr clamp(350px, 24vw, 420px)",
+          gap: 28,
           alignItems: "flex-start"
         }}>
           {/* ════════════════════════════════════════════════
@@ -240,7 +240,7 @@ const DenunciaPortalPage = ({ navigate }) => {
             <div style={{
               background: "radial-gradient(ellipse at 85% 50%, #103366 0%, #00204D 55%, #05162E 100%)",
               borderRadius: 16,
-              padding: "32px 36px",
+              padding: "36px 42px",
               color: "#FFFFFF",
               display: "flex",
               justifyContent: "space-between",
@@ -250,9 +250,9 @@ const DenunciaPortalPage = ({ navigate }) => {
               boxShadow: "0 10px 30px rgba(0,32,77,0.14)"
             }}>
               {/* Left Text in Hero */}
-              <div style={{ maxWidth: 540, zIndex: 2 }}>
+              <div style={{ maxWidth: 680, zIndex: 2 }}>
                 <h1 style={{
-                  fontSize: 27,
+                  fontSize: 30,
                   fontWeight: 700,
                   margin: 0,
                   lineHeight: 1.25,
@@ -263,10 +263,10 @@ const DenunciaPortalPage = ({ navigate }) => {
                   <span style={{ color: "#FF6A00", fontWeight: 800 }}>Aqui</span>, você é ouvido e protegido.
                 </h1>
                 <p style={{
-                  margin: "12px 0 22px",
-                  fontSize: 13.5,
-                  lineHeight: 1.5,
-                  color: "rgba(255,255,255,0.82)"
+                  margin: "14px 0 24px",
+                  fontSize: 14.5,
+                  lineHeight: 1.55,
+                  color: "rgba(255,255,255,0.85)"
                 }}>
                   Um ambiente seguro, sigiloso e independente para denunciar, relatar ou sugerir melhorias. Sua identidade é protegida e sua mensagem importa.
                 </p>
